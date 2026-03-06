@@ -330,11 +330,10 @@ def _signin_panel() -> None:
             st.rerun()
         else:
             st.error("❌  Incorrect username or password.")
-"""
-    st.markdown("""<div class='demo-badge'>
-        🔑 Demo account &nbsp;·&nbsp; <b>admin</b> / <b>admin123</b>
-    </div>""", unsafe_allow_html=True)
-"""
+
+#    st.markdown("""<div class='demo-badge'>
+ #       🔑 Demo account &nbsp;·&nbsp; <b>admin</b> / <b>admin123</b>
+  #  </div>""", unsafe_allow_html=True)
 
 def _signup_panel() -> None:
     """Render the Sign Up form with live validation feedback."""
