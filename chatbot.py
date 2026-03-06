@@ -339,7 +339,7 @@ def _signup_panel() -> None:
     """Render the Sign Up form with live validation feedback."""
     st.markdown("")
 
-    full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
+    full_name = st.text_input("🙂  Full Name", key="su_name",
                               placeholder="Iqbal")
 
    
