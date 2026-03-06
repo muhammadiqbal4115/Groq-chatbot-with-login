@@ -1,7 +1,3 @@
-# ╔══════════════════════════════════════════════════════════════╗
-# ║         Groq AI Chatbot — with Login + Persistent History   ║
-# ║         Built with Streamlit · LangChain · Groq             ║
-# ╚══════════════════════════════════════════════════════════════╝
 
 import os
 import json
@@ -16,8 +12,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-
-# ── Environment ───────────────────────────────────────────────────────────────
 load_dotenv()
 ENV_GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 
@@ -27,18 +21,12 @@ st.set_page_config(
     layout="wide"
 )
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  DATA LAYER — files stored in  ./chat_data/
-# ══════════════════════════════════════════════════════════════════════════════
-
 DATA_DIR   = "chat_data"
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 HIST_DIR   = os.path.join(DATA_DIR, "histories")
 os.makedirs(HIST_DIR, exist_ok=True)
 
 
-# ── Auth helpers ──────────────────────────────────────────────────────────────
 
 def _hp(password: str) -> str:
     """SHA-256 hash a password."""
@@ -73,8 +61,6 @@ def reg_user(username: str, password: str) -> bool:
     save_users(users)
     return True
 
-
-# ── Session helpers ────────────────────────────────────────────────────────────
 
 def udir(username: str) -> str:
     """Return (and create) the per-user history directory."""
@@ -132,8 +118,6 @@ def delete_session(username: str, sid: str) -> None:
         os.remove(hist_path)
 
 
-# ── Message helpers ────────────────────────────────────────────────────────────
-
 def _hf(username: str, sid: str) -> str:
     """Path to the JSON history file for one session."""
     return os.path.join(udir(username), f"{sid}.json")
@@ -168,8 +152,6 @@ def add_msg(username: str, sid: str, role: str, content: str) -> None:
     save_msgs(username, sid, msgs)
 
 
-# ── LangChain in-memory bridge ────────────────────────────────────────────────
-
 def get_lc_mem(username: str, sid: str) -> InMemoryChatMessageHistory:
     """
     Return a (cached) InMemoryChatMessageHistory seeded from disk.
@@ -187,8 +169,6 @@ def get_lc_mem(username: str, sid: str) -> InMemoryChatMessageHistory:
         st.session_state[key] = h
     return st.session_state[key]
 
-
-# ── LLM call ──────────────────────────────────────────────────────────────────
 
 def generate_response(username: str, sid: str, user_input: str,
                       api_key: str, settings: dict) -> str:
@@ -215,11 +195,6 @@ def generate_response(username: str, sid: str, user_input: str,
         {"input": user_input, "system_prompt": settings["system_prompt"]},
         config={"configurable": {"session_id": sid}},
     )
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  AUTH HELPERS — validation
-# ══════════════════════════════════════════════════════════════════════════════
 
 import re
 
@@ -261,10 +236,6 @@ def password_strength(password: str) -> tuple[int, str, str]:
     colors = {0: "#e74c3c", 1: "#e67e22", 2: "#f1c40f", 3: "#2ecc71", 4: "#27ae60"}
     return score, labels[score], colors[score]
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  AUTH PAGE  (Sign In  +  Sign Up)
-# ══════════════════════════════════════════════════════════════════════════════
 
 _AUTH_CSS = """
 <style>
@@ -370,11 +341,10 @@ def _signup_panel() -> None:
     """Render the Sign Up form with live validation feedback."""
     st.markdown("")
 
-    # ── Full name (optional) ──────────────────────────────────────────────────
     full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
-                              placeholder="Jane Doe")
+                              placeholder="Iqbal")
 
-    # ── Username ──────────────────────────────────────────────────────────────
+   
     su_un = st.text_input("👤  Username", key="su_un",
                           placeholder="min 3 chars, letters/numbers/_ .-")
     un_err = validate_username(su_un) if su_un else None
@@ -393,7 +363,7 @@ def _signup_panel() -> None:
                             "✔ Username available!</span>",
                             unsafe_allow_html=True)
 
-    # ── Password ──────────────────────────────────────────────────────────────
+  
     su_pw1 = st.text_input("🔒  Password", type="password", key="su_pw1",
                            placeholder="min 6 chars, letter + number")
 
@@ -424,7 +394,7 @@ def _signup_panel() -> None:
             unsafe_allow_html=True,
         )
 
-    # ── Confirm password ──────────────────────────────────────────────────────
+    
     su_pw2 = st.text_input("🔒  Confirm Password", type="password", key="su_pw2",
                            placeholder="Re-enter your password")
     if su_pw2 and su_pw1:
@@ -435,7 +405,7 @@ def _signup_panel() -> None:
             st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
                         "⚠ Passwords do not match</span>", unsafe_allow_html=True)
 
-    # ── Terms ─────────────────────────────────────────────────────────────────
+    
     st.markdown("")
     agree = st.checkbox("I agree to the Terms of Service and Privacy Policy",
                         key="su_agree")
