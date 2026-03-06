@@ -1,4 +1,3 @@
-
 import os
 import json
 import time
@@ -331,11 +330,11 @@ def _signin_panel() -> None:
             st.rerun()
         else:
             st.error("❌  Incorrect username or password.")
-
+"""
     st.markdown("""<div class='demo-badge'>
         🔑 Demo account &nbsp;·&nbsp; <b>admin</b> / <b>admin123</b>
     </div>""", unsafe_allow_html=True)
-
+"""
 
 def _signup_panel() -> None:
     """Render the Sign Up form with live validation feedback."""
@@ -419,7 +418,6 @@ def _signup_panel() -> None:
         p1 = su_pw1
         p2 = su_pw2
 
-        # ── Validation gate ────────────────────────────────────────────────
         err = validate_username(u)
         if err:
             st.error(f"⚠️  {err}")
@@ -434,7 +432,6 @@ def _signup_panel() -> None:
             elif not agree:
                 st.error("⚠️  Please accept the Terms of Service to continue.")
             else:
-                # ── All good — create account ──────────────────────────────
                 if reg_user(u, p1):
                     # Persist optional display name
                     if full_name.strip():
@@ -475,10 +472,6 @@ def login_page() -> None:
             _signup_panel()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  MAIN CHAT APP
-# ══════════════════════════════════════════════════════════════════════════════
-
 def chat_app() -> None:
 
     username = st.session_state.username
@@ -494,11 +487,9 @@ def chat_app() -> None:
             not any(s["id"] == st.session_state.active_sid for s in sessions)):
         st.session_state.active_sid = sessions[0]["id"]
 
-    # ══════════ SIDEBAR ══════════════════════════════════════════════════════
 
     with st.sidebar:
 
-        # ── User header ───────────────────────────────────────────────────────
         st.markdown(f"### 👤 {username}")
         if st.button("🚪 Logout", use_container_width=True):
             for k in list(st.session_state.keys()):
@@ -507,7 +498,6 @@ def chat_app() -> None:
 
         st.divider()
 
-        # ── Model settings ────────────────────────────────────────────────────
         st.header("⚙️ Settings")
 
         api_input = st.text_input(
@@ -559,7 +549,6 @@ def chat_app() -> None:
 
         st.divider()
 
-        # ── Session management ────────────────────────────────────────────────
         st.header("💬 Sessions")
 
         c_name, c_btn = st.columns([3, 1])
@@ -607,8 +596,6 @@ def chat_app() -> None:
             st.session_state.pop(f"lc_{username}_{sid}", None)
             st.rerun()
 
-    # ══════════ MAIN AREA ════════════════════════════════════════════════════
-
     st.title("🤖 Groq AI Chatbot")
     st.caption(
         f"Streamlit · LangChain · Groq  |  👤 **{username}**"
@@ -629,7 +616,6 @@ def chat_app() -> None:
         st.info("No sessions found. Click ➕ in the sidebar to create one.")
         return
 
-    # ── Tab bar — one tab per session ────────────────────────────────────────
     tab_labels = [
         ("▶ " if s["id"] == active_sid else "") + s["name"]
         for s in sessions
@@ -651,7 +637,6 @@ def chat_app() -> None:
                     st.session_state.active_sid = sid
                     st.rerun()
 
-            # ── Scrollable message history ────────────────────────────────────
             with st.container(height=460, border=True):
                 if not msgs:
                     st.markdown(
@@ -669,7 +654,6 @@ def chat_app() -> None:
                                 ts = m["ts"][:19].replace("T", "  ")
                                 st.caption(f"🕐 {ts}")
 
-            # ── Input row (active session only) ───────────────────────────────
             if is_active:
                 col_inp, col_btn = st.columns([7, 1])
                 with col_inp:
@@ -685,7 +669,6 @@ def chat_app() -> None:
                         type="primary", use_container_width=True
                     )
 
-                # ── Handle send ───────────────────────────────────────────────
                 if send and user_input.strip():
                     ui = user_input.strip()
 
@@ -717,7 +700,6 @@ def chat_app() -> None:
 
                     st.rerun()
 
-                # ── Export ────────────────────────────────────────────────────
                 if msgs:
                     with st.expander("⬇️ Export Chat History"):
                         export_json = json.dumps(
@@ -755,11 +737,6 @@ def chat_app() -> None:
                                 key=f"dt_{sid}",
                                 use_container_width=True,
                             )
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  ENTRY POINT
-# ══════════════════════════════════════════════════════════════════════════════
 
 if not st.session_state.get("logged_in"):
     login_page()
