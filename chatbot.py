@@ -9,10 +9,8 @@ import streamlit as st
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-
 import gspread
 from google.oauth2.service_account import Credentials
-
 from langchain_groq import ChatGroq
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -493,13 +491,13 @@ def _signin_panel():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SIGN UP PANEL  (FIX 1 — email field + uniqueness check)
+#  SIGN UP PANEL  (email field + uniqueness check)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _signup_panel():
     st.markdown("")
-    full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
-                              placeholder="Jane Doe")
+    full_name = st.text_input("🙂  Full Name", key="su_name",
+                              placeholder="Enter Your Full Name")
 
     # ── Username ──────────────────────────────────────────────────────────────
     su_un = st.text_input("👤  Username", key="su_un",
@@ -516,7 +514,7 @@ def _signup_panel():
             st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
                         "✔ Username available!</span>", unsafe_allow_html=True)
 
-    # ── Email (FIX 1) ─────────────────────────────────────────────────────────
+    # ── Email ─────────────────────────────────────────────────────────
     su_email = st.text_input("📧  Email", key="su_email",
                              placeholder="you@example.com")
     if su_email:
@@ -794,13 +792,15 @@ def chat_app():
         groq_key = st.text_input(
             "Groq API Key",
             type="password",
-            placeholder="sk-… (or set in Streamlit Secrets)",
+            placeholder="Enter Your GROQ API Key",
         ).strip() or st.secrets.get("GROQ_API_KEY", "")
 
         model = st.selectbox("Model", [
             "llama-3.3-70b-versatile",
             "openai/gpt-oss-120b",
             "qwen/qwen3-32b",
+            "moonshotai/kimi-k2-instruct",
+            "groq/compound",
         ])
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
