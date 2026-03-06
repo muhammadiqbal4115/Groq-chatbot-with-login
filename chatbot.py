@@ -498,8 +498,8 @@ def _signin_panel():
 
 def _signup_panel():
     st.markdown("")
-    full_name = st.text_input("🙂  Full Name", key="su_name",
-                              placeholder="Enter Your Full Name")
+    full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
+                              placeholder="Jane Doe")
 
     # ── Username ──────────────────────────────────────────────────────────────
     su_un = st.text_input("👤  Username", key="su_un",
@@ -774,9 +774,11 @@ def chat_app():
             not any(s["session_id"] == st.session_state.active_sid for s in sessions)):
         st.session_state.active_sid = sessions[0]["session_id"]
 
-    # ── FIX 2: seed sys_prompt_value once in session_state ────────────────────
+    # ── Seed prompt + tone index once in session_state ───────────────────────
     if "sys_prompt_value" not in st.session_state:
         st.session_state.sys_prompt_value = DEFAULT_PROMPT
+    if "_tone_idx" not in st.session_state:
+        st.session_state._tone_idx = 0   # 0 = "Custom"
 
     # ── SIDEBAR ───────────────────────────────────────────────────────────────
     with st.sidebar:
@@ -792,49 +794,44 @@ def chat_app():
         groq_key = st.text_input(
             "Groq API Key",
             type="password",
-            placeholder="Paste your GROQ API Key here)",
+            placeholder="sk-… (or set in Streamlit Secrets)",
         ).strip() or st.secrets.get("GROQ_API_KEY", "")
 
         model = st.selectbox("Model", [
             "llama-3.3-70b-versatile",
             "openai/gpt-oss-120b",
             "qwen/qwen3-32b",
-            "groq/compound",
-            "moonshotai/kimi-k2-instruct"
         ])
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
 
-        # ── FIX 2: Tone preset — sync prompt text into session_state ─────────
-        tone_preset = st.selectbox(
+        # ── Tone preset — controlled via index, no widget key ────────────────
+        _tone_options = ["Custom", "Friendly", "Strict", "Teacher"]
+        tone_preset   = st.selectbox(
             "Tone Preset",
-            ["Custom", "Friendly", "Strict", "Teacher"],
-            key="tone_preset_select",
+            _tone_options,
+            index=st.session_state._tone_idx,   # driven by session state
         )
-        # When user picks a non-Custom preset, push its text into session state
-        if tone_preset != "Custom":
-            if st.session_state.get("_last_tone") != tone_preset:
+        # When user picks a preset, update index + push prompt text
+        new_tone_idx = _tone_options.index(tone_preset)
+        if new_tone_idx != st.session_state._tone_idx:
+            st.session_state._tone_idx = new_tone_idx
+            if tone_preset != "Custom":
                 st.session_state.sys_prompt_value = TONE_MAP[tone_preset]
-                st.session_state._last_tone = tone_preset
-        else:
-            st.session_state._last_tone = "Custom"
 
-        # ── FIX 2: text_area is driven by session_state ───────────────────────
+        # System prompt text area — value driven by session state
         new_prompt = st.text_area(
             "System Prompt",
             value=st.session_state.sys_prompt_value,
             height=110,
-            key="sys_prompt_area",
         )
-        # Keep session_state in sync when user manually edits
+        # Keep in sync when user types manually
         st.session_state.sys_prompt_value = new_prompt
 
-        # ── FIX 2: Reset button clears prompt AND resets tone to Custom ───────
+        # Reset button — sets prompt back to default AND resets selectbox to "Custom"
         if st.button("↺ Reset Prompt"):
-            st.session_state.sys_prompt_value   = DEFAULT_PROMPT
-            st.session_state._last_tone         = "Custom"
-            # Force the selectbox back to "Custom" (index 0)
-            st.session_state.tone_preset_select = "Custom"
+            st.session_state.sys_prompt_value = DEFAULT_PROMPT
+            st.session_state._tone_idx        = 0   # back to "Custom"
             st.rerun()
 
         typing = st.checkbox("Enable typing effect", value=True)
@@ -899,7 +896,7 @@ def chat_app():
     )
 
     if not groq_key:
-        st.error("🔑 Groq API Key missing.")
+        st.error("🔑 Groq API Key missing. Add GROQ_API_KEY to Streamlit Secrets.")
         st.stop()
 
     sessions   = load_sessions(username)
