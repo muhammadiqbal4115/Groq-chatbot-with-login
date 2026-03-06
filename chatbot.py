@@ -218,68 +218,291 @@ def generate_response(username: str, sid: str, user_input: str,
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  LOGIN PAGE
+#  AUTH HELPERS — validation
 # ══════════════════════════════════════════════════════════════════════════════
 
-def login_page() -> None:
+import re
 
-    # ── Custom CSS ────────────────────────────────────────────────────────────
-    st.markdown("""
-    <style>
-      section[data-testid="stSidebar"] { display: none; }
-      .login-header { text-align: center; padding: 2rem 0 0.5rem; }
-      .login-sub    { text-align: center; color: #888; margin-bottom: 1.5rem; font-size: 0.95rem; }
-    </style>
-    """, unsafe_allow_html=True)
+def validate_username(username: str) -> str | None:
+    """Return an error string or None if valid."""
+    u = username.strip()
+    if not u:
+        return "Username cannot be empty."
+    if len(u) < 3:
+        return "Username must be at least 3 characters."
+    if len(u) > 32:
+        return "Username must be 32 characters or fewer."
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", u):
+        return "Username may only contain letters, numbers, _, . or -"
+    return None
 
-    _, col, _ = st.columns([1, 1.4, 1])
-    with col:
-        st.markdown("<div class='login-header'><h1>🤖 Groq AI Chatbot</h1></div>",
-                    unsafe_allow_html=True)
-        st.markdown("<div class='login-sub'>Sign in to start chatting</div>",
-                    unsafe_allow_html=True)
-        st.divider()
 
-        tab_login, tab_register = st.tabs(["🔑  Login", "📝  Register"])
+def validate_password(password: str) -> str | None:
+    """Return an error string or None if valid."""
+    if not password:
+        return "Password cannot be empty."
+    if len(password) < 6:
+        return "Password must be at least 6 characters."
+    if not re.search(r"[A-Za-z]", password):
+        return "Password must contain at least one letter."
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+    return None
 
-        # ── Login ─────────────────────────────────────────────────────────────
-        with tab_login:
-            un = st.text_input("Username", key="l_un", placeholder="your-username")
-            pw = st.text_input("Password", type="password", key="l_pw",
-                               placeholder="••••••••")
 
-            if st.button("Login", type="primary", use_container_width=True, key="btn_login"):
-                if not un.strip() or not pw:
-                    st.error("Please fill in both fields.")
-                elif auth_user(un.strip(), pw):
+def password_strength(password: str) -> tuple[int, str, str]:
+    """Return (score 0-4, label, colour)."""
+    score = 0
+    if len(password) >= 6:   score += 1
+    if len(password) >= 10:  score += 1
+    if re.search(r"[A-Z]", password): score += 1
+    if re.search(r"[^A-Za-z0-9]", password): score += 1
+    labels = {0: "Very Weak", 1: "Weak", 2: "Fair", 3: "Strong", 4: "Very Strong"}
+    colors = {0: "#e74c3c", 1: "#e67e22", 2: "#f1c40f", 3: "#2ecc71", 4: "#27ae60"}
+    return score, labels[score], colors[score]
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  AUTH PAGE  (Sign In  +  Sign Up)
+# ══════════════════════════════════════════════════════════════════════════════
+
+_AUTH_CSS = """
+<style>
+  /* hide sidebar on auth screen */
+  section[data-testid="stSidebar"] { display:none !important; }
+
+  /* card wrapper */
+  .auth-card {
+      background: #1a1a2e;
+      border: 1px solid #2d2d4e;
+      border-radius: 16px;
+      padding: 2.4rem 2rem 2rem;
+      margin-top: 1rem;
+  }
+  .auth-logo  { text-align:center; font-size:3.2rem; margin-bottom:.3rem; }
+  .auth-title { text-align:center; font-size:1.7rem; font-weight:700;
+                color:#e2e2f0; margin-bottom:.25rem; }
+  .auth-sub   { text-align:center; color:#888; font-size:.88rem;
+                margin-bottom:1.4rem; }
+
+  /* tabs override */
+  button[data-baseweb="tab"] {
+      font-size: .95rem !important;
+      font-weight: 600 !important;
+  }
+
+  /* strength bar */
+  .strength-bar-bg {
+      background:#2d2d4e; border-radius:6px;
+      height:6px; width:100%; margin:4px 0 2px;
+  }
+  .strength-bar-fill {
+      height:6px; border-radius:6px;
+      transition: width .4s ease, background .4s ease;
+  }
+  .strength-label { font-size:.78rem; }
+
+  /* hint pills */
+  .hint-pill {
+      display:inline-block;
+      background:#23234a; border:1px solid #3a3a6a;
+      border-radius:20px; padding:2px 10px;
+      font-size:.78rem; color:#aaa; margin:2px 3px;
+  }
+  .hint-ok { border-color:#2ecc71; color:#2ecc71; background:#0d2e1a; }
+
+  /* divider with text */
+  .or-divider {
+      display:flex; align-items:center; gap:.8rem;
+      margin:1rem 0; color:#555; font-size:.82rem;
+  }
+  .or-divider::before, .or-divider::after {
+      content:""; flex:1; height:1px; background:#2d2d4e;
+  }
+
+  /* demo badge */
+  .demo-badge {
+      background:#1e3a5f; border:1px solid #2255a4;
+      border-radius:8px; padding:.55rem .9rem;
+      font-size:.82rem; color:#9ec5fe; margin-top:.8rem;
+      text-align:center;
+  }
+</style>
+"""
+
+
+def _signin_panel() -> None:
+    """Render the Sign In form."""
+    st.markdown("")
+    un = st.text_input("👤  Username", key="si_un",
+                       placeholder="Enter your username")
+    pw = st.text_input("🔒  Password", type="password", key="si_pw",
+                       placeholder="Enter your password")
+
+    col_rem, _ = st.columns([1, 2])
+    with col_rem:
+        remember = st.checkbox("Remember me", key="si_rem", value=True)
+
+    st.markdown("")
+    clicked = st.button("Sign In  →", type="primary",
+                        use_container_width=True, key="btn_signin")
+
+    if clicked:
+        u = un.strip()
+        if not u or not pw:
+            st.error("⚠️  Please fill in both fields.")
+        elif auth_user(u, pw):
+            st.session_state.logged_in  = True
+            st.session_state.username   = u
+            st.session_state.remembered = remember
+            st.success(f"✅  Welcome back, **{u}**!")
+            time.sleep(0.6)
+            st.rerun()
+        else:
+            st.error("❌  Incorrect username or password.")
+
+    st.markdown("""<div class='demo-badge'>
+        🔑 Demo account &nbsp;·&nbsp; <b>admin</b> / <b>admin123</b>
+    </div>""", unsafe_allow_html=True)
+
+
+def _signup_panel() -> None:
+    """Render the Sign Up form with live validation feedback."""
+    st.markdown("")
+
+    # ── Full name (optional) ──────────────────────────────────────────────────
+    full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
+                              placeholder="Jane Doe")
+
+    # ── Username ──────────────────────────────────────────────────────────────
+    su_un = st.text_input("👤  Username", key="su_un",
+                          placeholder="min 3 chars, letters/numbers/_ .-")
+    un_err = validate_username(su_un) if su_un else None
+    if su_un:
+        if un_err:
+            st.markdown(f"<span style='color:#e74c3c;font-size:.82rem'>⚠ {un_err}</span>",
+                        unsafe_allow_html=True)
+        else:
+            # Check availability live
+            if su_un.strip() in load_users():
+                st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+                            "⚠ Username already taken.</span>",
+                            unsafe_allow_html=True)
+            else:
+                st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
+                            "✔ Username available!</span>",
+                            unsafe_allow_html=True)
+
+    # ── Password ──────────────────────────────────────────────────────────────
+    su_pw1 = st.text_input("🔒  Password", type="password", key="su_pw1",
+                           placeholder="min 6 chars, letter + number")
+
+    # Strength meter
+    if su_pw1:
+        score, label, color = password_strength(su_pw1)
+        pct = int((score / 4) * 100)
+        st.markdown(
+            f"<div class='strength-bar-bg'>"
+            f"  <div class='strength-bar-fill'"
+            f"       style='width:{pct}%;background:{color}'></div>"
+            f"</div>"
+            f"<span class='strength-label' style='color:{color}'>"
+            f"  Password strength: <b>{label}</b></span>",
+            unsafe_allow_html=True,
+        )
+        # Requirement pills
+        has_len    = len(su_pw1) >= 6
+        has_letter = bool(re.search(r"[A-Za-z]", su_pw1))
+        has_digit  = bool(re.search(r"[0-9]",    su_pw1))
+        def pill(text, ok):
+            cls = "hint-pill hint-ok" if ok else "hint-pill"
+            return f"<span class='{cls}'>{'✔' if ok else '·'} {text}</span>"
+        st.markdown(
+            pill("6+ chars", has_len) +
+            pill("Letter",   has_letter) +
+            pill("Number",   has_digit),
+            unsafe_allow_html=True,
+        )
+
+    # ── Confirm password ──────────────────────────────────────────────────────
+    su_pw2 = st.text_input("🔒  Confirm Password", type="password", key="su_pw2",
+                           placeholder="Re-enter your password")
+    if su_pw2 and su_pw1:
+        if su_pw1 == su_pw2:
+            st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
+                        "✔ Passwords match</span>", unsafe_allow_html=True)
+        else:
+            st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+                        "⚠ Passwords do not match</span>", unsafe_allow_html=True)
+
+    # ── Terms ─────────────────────────────────────────────────────────────────
+    st.markdown("")
+    agree = st.checkbox("I agree to the Terms of Service and Privacy Policy",
+                        key="su_agree")
+
+    st.markdown("")
+    clicked = st.button("Create Account  →", type="primary",
+                        use_container_width=True, key="btn_signup")
+
+    if clicked:
+        u  = su_un.strip()
+        p1 = su_pw1
+        p2 = su_pw2
+
+        # ── Validation gate ────────────────────────────────────────────────
+        err = validate_username(u)
+        if err:
+            st.error(f"⚠️  {err}")
+        elif u in load_users():
+            st.error("❌  Username already taken — please choose another.")
+        else:
+            perr = validate_password(p1)
+            if perr:
+                st.error(f"⚠️  {perr}")
+            elif p1 != p2:
+                st.error("⚠️  Passwords do not match.")
+            elif not agree:
+                st.error("⚠️  Please accept the Terms of Service to continue.")
+            else:
+                # ── All good — create account ──────────────────────────────
+                if reg_user(u, p1):
+                    # Persist optional display name
+                    if full_name.strip():
+                        dn_file = os.path.join(DATA_DIR, "display_names.json")
+                        dns = {}
+                        if os.path.exists(dn_file):
+                            with open(dn_file) as f:
+                                dns = json.load(f)
+                        dns[u] = full_name.strip()
+                        with open(dn_file, "w") as f:
+                            json.dump(dns, f, indent=2)
+
+                    st.success(f"🎉  Account created! Welcome, **{u}**.")
                     st.session_state.logged_in = True
-                    st.session_state.username  = un.strip()
+                    st.session_state.username  = u
+                    time.sleep(0.8)
                     st.rerun()
                 else:
-                    st.error("❌ Invalid username or password.")
+                    st.error("Something went wrong. Please try again.")
 
-            st.caption("Demo account → **admin** / **admin123**")
 
-        # ── Register ──────────────────────────────────────────────────────────
-        with tab_register:
-            nu  = st.text_input("Choose Username", key="r_un", placeholder="your-username")
-            np1 = st.text_input("Password (min 4 chars)", type="password",
-                                key="r_pw1", placeholder="••••••••")
-            np2 = st.text_input("Confirm Password", type="password",
-                                key="r_pw2", placeholder="••••••••")
+def login_page() -> None:
+    st.markdown(_AUTH_CSS, unsafe_allow_html=True)
 
-            if st.button("Create Account", type="primary",
-                         use_container_width=True, key="btn_reg"):
-                if not nu.strip():
-                    st.error("Username cannot be empty.")
-                elif len(np1) < 4:
-                    st.error("Password must be at least 4 characters.")
-                elif np1 != np2:
-                    st.error("Passwords don't match.")
-                elif reg_user(nu.strip(), np1):
-                    st.success("✅ Account created! Please log in.")
-                else:
-                    st.error("Username already taken — choose another.")
+    _, col, _ = st.columns([1, 1.5, 1])
+    with col:
+        st.markdown("<div class='auth-logo'>🤖</div>",  unsafe_allow_html=True)
+        st.markdown("<div class='auth-title'>Groq AI Chatbot</div>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-sub'>Powered by Streamlit · LangChain · Groq</div>",
+                    unsafe_allow_html=True)
+
+        tab_signin, tab_signup = st.tabs(["🔑  Sign In", "📝  Sign Up"])
+
+        with tab_signin:
+            _signin_panel()
+
+        with tab_signup:
+            _signup_panel()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -546,4 +769,29 @@ def chat_app() -> None:
                         ec1, ec2 = st.columns(2)
                         with ec1:
                             st.download_button(
-                                "📥 Download")
+                                "📥 Download JSON",
+                                data=export_json,
+                                file_name=f"{sess['name']}.json",
+                                mime="application/json",
+                                key=f"dj_{sid}",
+                                use_container_width=True,
+                            )
+                        with ec2:
+                            st.download_button(
+                                "📥 Download TXT",
+                                data=export_txt,
+                                file_name=f"{sess['name']}.txt",
+                                mime="text/plain",
+                                key=f"dt_{sid}",
+                                use_container_width=True,
+                            )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  ENTRY POINT
+# ══════════════════════════════════════════════════════════════════════════════
+
+if not st.session_state.get("logged_in"):
+    login_page()
+else:
+    chat_app()
