@@ -792,13 +792,15 @@ def chat_app():
         groq_key = st.text_input(
             "Groq API Key",
             type="password",
-            placeholder="sk-… (or set in Streamlit Secrets)",
+            placeholder="Paste your GROQ API Key here)",
         ).strip() or st.secrets.get("GROQ_API_KEY", "")
 
         model = st.selectbox("Model", [
             "llama-3.3-70b-versatile",
             "openai/gpt-oss-120b",
             "qwen/qwen3-32b",
+            "groq/compound",
+            "moonshotai/kimi-k2-instruct"
         ])
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
@@ -897,7 +899,7 @@ def chat_app():
     )
 
     if not groq_key:
-        st.error("🔑 Groq API Key missing. Add GROQ_API_KEY to Streamlit Secrets.")
+        st.error("🔑 Groq API Key missing.")
         st.stop()
 
     sessions   = load_sessions(username)
