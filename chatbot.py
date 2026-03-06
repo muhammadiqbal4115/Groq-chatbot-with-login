@@ -55,11 +55,9 @@ def get_spreadsheet():
         sh = client.create(name)
 
     required = {
-        # ── FIX 1: email column added ─────────────────────────────────────────
         "users":           ["username", "password_hash", "full_name", "email", "created_at"],
         "sessions":        ["username", "session_id", "name", "created", "updated"],
         "messages":        ["username", "session_id", "role", "content", "ts"],
-        # ── FIX 3: sheet for password-reset OTPs ──────────────────────────────
         "password_resets": ["email", "otp", "expires_at", "used"],
     }
     existing = {w.title for w in sh.worksheets()}
@@ -108,13 +106,11 @@ def user_exists(username: str) -> bool:
 
 
 def email_exists(email: str) -> bool:
-    """Case-insensitive check across all registered emails."""
     e = email.lower().strip()
     return any(v["email"] == e for v in load_users().values())
 
 
 def get_username_by_email(email: str):
-    """Return username whose email matches, or None."""
     e = email.lower().strip()
     for username, data in load_users().items():
         if data["email"] == e:
@@ -141,9 +137,8 @@ def reg_user(username: str, password: str,
 
 
 def update_password(username: str, new_password: str):
-    """Overwrite the password_hash cell for the given user."""
     sheet = ws("users")
-    data  = sheet.get_all_values()          # list-of-lists incl. header
+    data  = sheet.get_all_values()
     for i, row in enumerate(data[1:], start=2):
         if row[0] == username:
             sheet.update_cell(i, 2, _hp(new_password))
@@ -152,7 +147,7 @@ def update_password(username: str, new_password: str):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  FIX 3 — PASSWORD RESET  (OTP via email)
+#  PASSWORD RESET  (OTP via email)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _generate_otp(length: int = 6) -> str:
@@ -160,12 +155,6 @@ def _generate_otp(length: int = 6) -> str:
 
 
 def send_reset_email(to_email: str, otp: str) -> bool:
-    """
-    Send the OTP via Gmail SMTP.
-    Requires in Streamlit Secrets:
-        SMTP_EMAIL    = "yourapp@gmail.com"
-        SMTP_PASSWORD = "your-app-password"   (Gmail App Password)
-    """
     try:
         smtp_email = st.secrets["SMTP_EMAIL"]
         smtp_pass  = st.secrets["SMTP_PASSWORD"]
@@ -209,12 +198,10 @@ If you did not request this, please ignore this email.
 
 
 def store_otp(email: str, otp: str):
-    """Write (or overwrite) the OTP row for this email."""
     sheet   = ws("password_resets")
     data    = sheet.get_all_values()
     expires = (datetime.now() + timedelta(minutes=10)).isoformat()
     e       = email.lower().strip()
-
     for i, row in enumerate(data[1:], start=2):
         if row and row[0].lower().strip() == e:
             sheet.update(f"A{i}:D{i}", [[e, otp, expires, "no"]])
@@ -223,17 +210,10 @@ def store_otp(email: str, otp: str):
 
 
 def verify_otp(email: str, otp: str) -> str:
-    """
-    Returns:
-        "ok"      — valid and unused
-        "expired" — past expiry time
-        "used"    — already consumed
-        "invalid" — not found or wrong code
-    """
     e    = email.lower().strip()
     rows = all_rows("password_resets")
     for r in rows:
-        if r.get("email", "").lower().strip() == e and r.get("otp") == otp:
+        if r.get("email", "").lower().strip() == e and str(r.get("otp")) == otp:
             if r.get("used", "no") == "yes":
                 return "used"
             if datetime.fromisoformat(str(r["expires_at"])) < datetime.now():
@@ -243,7 +223,6 @@ def verify_otp(email: str, otp: str) -> str:
 
 
 def consume_otp(email: str, otp: str):
-    """Mark the OTP row as used so it cannot be replayed."""
     sheet = ws("password_resets")
     data  = sheet.get_all_values()
     e     = email.lower().strip()
@@ -413,10 +392,10 @@ def validate_email(email: str):
 
 
 def validate_password(password: str):
-    if not password:                            return "Password cannot be empty."
-    if len(password) < 6:                       return "Password must be at least 6 characters."
-    if not re.search(r"[A-Za-z]", password):   return "Must contain at least one letter."
-    if not re.search(r"[0-9]", password):       return "Must contain at least one number."
+    if not password:                           return "Password cannot be empty."
+    if len(password) < 6:                      return "Password must be at least 6 characters."
+    if not re.search(r"[A-Za-z]", password):  return "Must contain at least one letter."
+    if not re.search(r"[0-9]", password):      return "Must contain at least one number."
     return None
 
 
@@ -454,6 +433,9 @@ _AUTH_CSS = """
   .info-box  { background:#1e3a5f; border:1px solid #2255a4; border-radius:8px;
                padding:.6rem 1rem; font-size:.82rem; color:#9ec5fe;
                margin-top:.8rem; text-align:center; }
+  .warn-box  { background:#2e1e1e; border:1px solid #a44; border-radius:8px;
+               padding:.6rem 1rem; font-size:.82rem; color:#ffaaaa;
+               margin-top:.8rem; text-align:center; }
   .otp-box   { background:#1a2e1a; border:1px solid #2ecc71; border-radius:8px;
                padding:.7rem 1rem; font-size:.85rem; color:#aaffaa;
                margin:.6rem 0; text-align:center; }
@@ -475,23 +457,47 @@ def _signin_panel():
     if st.button("Sign In  →", type="primary",
                  use_container_width=True, key="btn_signin"):
         u = un.strip()
+
         if not u or not pw:
             st.error("⚠️  Please fill in both fields.")
-        elif auth_user(u, pw):
+
+        # ── CHECK 1: username does not exist at all ───────────────────────────
+        elif not user_exists(u):
+            st.error("❌  User not found. Please sign up first.")
+            st.markdown(
+                "<div class='warn-box'>"
+                "🆕 No account with that username. "
+                "Switch to the <b>Sign Up</b> tab to create one."
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+        # ── CHECK 2: username exists but password is wrong ────────────────────
+        elif not auth_user(u, pw):
+            st.error("🔑  Incorrect password. Please try again.")
+            st.markdown(
+                "<div class='info-box'>"
+                "Forgot your password? Use the <b>Forgot Password</b> tab →"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+        # ── SUCCESS ───────────────────────────────────────────────────────────
+        else:
             st.session_state.logged_in = True
             st.session_state.username  = u
             st.success(f"✅  Welcome back, **{u}**!")
             time.sleep(0.6)
             st.rerun()
-        else:
-            st.error("❌  Incorrect username or password.")
 
-    st.markdown("<div class='info-box'>No account yet? Switch to the <b>Sign Up</b> tab →</div>",
-                unsafe_allow_html=True)
+    st.markdown(
+        "<div class='info-box'>No account yet? Switch to the <b>Sign Up</b> or Switch to <b>Forget Password</b> if forget your password</div>",
+        unsafe_allow_html=True,
+    )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SIGN UP PANEL  (email field + uniqueness check)
+#  SIGN UP PANEL
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _signup_panel():
@@ -514,7 +520,7 @@ def _signup_panel():
             st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
                         "✔ Username available!</span>", unsafe_allow_html=True)
 
-    # ── Email ─────────────────────────────────────────────────────────
+    # ── Email ─────────────────────────────────────────────────────────────────
     su_email = st.text_input("📧  Email", key="su_email",
                              placeholder="you@example.com")
     if su_email:
@@ -604,19 +610,16 @@ def _signup_panel():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  FIX 3 — FORGOT PASSWORD PANEL
-#  Flow:  Step 1 → enter email → receive OTP
-#         Step 2 → enter OTP + new password → done
+#  FORGOT PASSWORD PANEL
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _forgot_password_panel():
     st.markdown("")
 
-    # Use session_state to track which step of the flow we're on
     if "fp_step" not in st.session_state:
-        st.session_state.fp_step      = 1   # 1 = enter email, 2 = enter OTP + new pw
-        st.session_state.fp_email     = ""
-        st.session_state.fp_username  = ""
+        st.session_state.fp_step     = 1
+        st.session_state.fp_email    = ""
+        st.session_state.fp_username = ""
 
     # ── STEP 1: Enter email ───────────────────────────────────────────────────
     if st.session_state.fp_step == 1:
@@ -634,7 +637,6 @@ def _forgot_password_panel():
             if e_err:
                 st.error(f"⚠️  {e_err}")
             elif not email_exists(email):
-                # Don't reveal whether email is registered (security best practice)
                 st.success("✅  If that email is registered, a reset code has been sent.")
             else:
                 username = get_username_by_email(email)
@@ -650,8 +652,10 @@ def _forgot_password_panel():
                     time.sleep(0.8)
                     st.rerun()
 
-        st.markdown("<div class='info-box'>Remembered your password? Go back to <b>Sign In →</b></div>",
-                    unsafe_allow_html=True)
+        st.markdown(
+            "<div class='info-box'>Remembered your password? Go back to <b>Sign In →</b></div>",
+            unsafe_allow_html=True,
+        )
 
     # ── STEP 2: Enter OTP + new password ─────────────────────────────────────
     elif st.session_state.fp_step == 2:
@@ -712,7 +716,7 @@ def _forgot_password_panel():
                         st.error("❌  This code has already been used. Please request a new one.")
                         st.session_state.fp_step = 1
                         st.rerun()
-                    else:  # "ok"
+                    else:
                         perr = validate_password(new_pw1)
                         if perr:
                             st.error(f"⚠️  {perr}")
@@ -722,7 +726,6 @@ def _forgot_password_panel():
                             consume_otp(email, otp)
                             update_password(username, new_pw1)
                             st.success("✅  Password reset successfully! You can now sign in.")
-                            # Clear forgot-password state
                             for k in ["fp_step", "fp_email", "fp_username"]:
                                 st.session_state.pop(k, None)
                             time.sleep(1.2)
@@ -742,14 +745,12 @@ def login_page():
     st.markdown(_AUTH_CSS, unsafe_allow_html=True)
     _, col, _ = st.columns([1, 1.5, 1])
     with col:
-        st.markdown("<div class='auth-logo'>🤖</div>",   unsafe_allow_html=True)
+        st.markdown("<div class='auth-logo'>🤖</div>", unsafe_allow_html=True)
         st.markdown("<div class='auth-title'>Groq AI Chatbot</div>", unsafe_allow_html=True)
         st.markdown(
             "<div class='auth-sub'>Streamlit · LangChain · Groq · ☁️ Google Sheets</div>",
             unsafe_allow_html=True,
         )
-
-        # FIX 3: three tabs now
         tab_si, tab_su, tab_fp = st.tabs(["🔑  Sign In", "📝  Sign Up", "🔓  Forgot Password"])
         with tab_si: _signin_panel()
         with tab_su: _signup_panel()
@@ -772,11 +773,11 @@ def chat_app():
             not any(s["session_id"] == st.session_state.active_sid for s in sessions)):
         st.session_state.active_sid = sessions[0]["session_id"]
 
-    # ── Seed prompt + tone index once in session_state ───────────────────────
+    # Seed prompt + tone index once
     if "sys_prompt_value" not in st.session_state:
         st.session_state.sys_prompt_value = DEFAULT_PROMPT
     if "_tone_idx" not in st.session_state:
-        st.session_state._tone_idx = 0   # 0 = "Custom"
+        st.session_state._tone_idx = 0
 
     # ── SIDEBAR ───────────────────────────────────────────────────────────────
     with st.sidebar:
@@ -805,33 +806,31 @@ def chat_app():
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
 
-        # ── Tone preset — controlled via index, no widget key ────────────────
+        # Tone preset — controlled via index (no widget key) to allow reset
         _tone_options = ["Custom", "Friendly", "Strict", "Teacher"]
         tone_preset   = st.selectbox(
             "Tone Preset",
             _tone_options,
-            index=st.session_state._tone_idx,   # driven by session state
+            index=st.session_state._tone_idx,
         )
-        # When user picks a preset, update index + push prompt text
         new_tone_idx = _tone_options.index(tone_preset)
         if new_tone_idx != st.session_state._tone_idx:
             st.session_state._tone_idx = new_tone_idx
             if tone_preset != "Custom":
                 st.session_state.sys_prompt_value = TONE_MAP[tone_preset]
 
-        # System prompt text area — value driven by session state
+        # System prompt text area
         new_prompt = st.text_area(
             "System Prompt",
             value=st.session_state.sys_prompt_value,
             height=110,
         )
-        # Keep in sync when user types manually
         st.session_state.sys_prompt_value = new_prompt
 
-        # Reset button — sets prompt back to default AND resets selectbox to "Custom"
+        # Reset button
         if st.button("↺ Reset Prompt"):
             st.session_state.sys_prompt_value = DEFAULT_PROMPT
-            st.session_state._tone_idx        = 0   # back to "Custom"
+            st.session_state._tone_idx        = 0
             st.rerun()
 
         typing = st.checkbox("Enable typing effect", value=True)
