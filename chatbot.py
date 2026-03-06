@@ -15,7 +15,7 @@ load_dotenv()
 ENV_GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 
 st.set_page_config(
-    page_title="🤖 Groq AI Chatbot",
+    page_title="Groq AI Chatbot",
     page_icon="🤖",
     layout="wide"
 )
