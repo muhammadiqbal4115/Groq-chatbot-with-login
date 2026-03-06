@@ -17,7 +17,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="🤖 Groq AI Chatbot",
+    page_title="Groq AI Chatbot",
     page_icon="🤖",
     layout="wide",
 )
