@@ -546,4 +546,4 @@ def chat_app() -> None:
                         ec1, ec2 = st.columns(2)
                         with ec1:
                             st.download_button(
-                                "📥 Download
+                                "📥 Download"
