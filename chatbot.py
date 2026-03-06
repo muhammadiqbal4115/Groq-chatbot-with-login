@@ -498,8 +498,8 @@ def _signin_panel():
 
 def _signup_panel():
     st.markdown("")
-    full_name = st.text_input("🙂  Full Name (optional)", key="su_name",
-                              placeholder="Jane Doe")
+    full_name = st.text_input("🙂  Full Name", key="su_name",
+                              placeholder="Enter Your Full Name")
 
     # ── Username ──────────────────────────────────────────────────────────────
     su_un = st.text_input("👤  Username", key="su_un",
