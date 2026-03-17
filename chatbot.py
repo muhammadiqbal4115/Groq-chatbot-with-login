@@ -37,567 +37,582 @@ TONE_MAP = {
     "Teacher":  "You are a patient teacher. Explain concepts clearly with examples.",
 }
 
-
 # ══════════════════════════════════════════════════════════════════════════════
-#  GLOBAL NEON LIGHT BLUE CSS — Applied on every render
+#  GLOBAL NEON BLUE CSS
 # ══════════════════════════════════════════════════════════════════════════════
 
-GLOBAL_CSS = """
+NEON_CSS = """
 <style>
-/* ─── HIDE ALL STREAMLIT CHROME ─────────────────────────────────────────── */
-/* NOTE: collapsedControl, title=Download, button[kind=header] intentionally
-   NOT hidden — they are real UI elements we want to keep visible.           */
-#MainMenu,
-footer,
-header,
-[data-testid="stHeader"],
-[data-testid="stToolbar"],
-[data-testid="stDecoration"],
-[data-testid="stStatusWidget"],
-[data-testid="stDeployButton"],
-.stDeployButton,
-.viewerBadge_container__r5tak,
-.viewerBadge_link__qRIco,
-#stDecoration { display: none !important; }
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap');
 
-/* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
+/* ── Root Variables ── */
 :root {
   --neon:        #00d4ff;
-  --neon-dim:    #0099cc;
-  --neon-bright: #66eeff;
-  --neon-glow:   0 0 8px #00d4ff, 0 0 20px #00d4ff55, 0 0 40px #00d4ff22;
-  --neon-glow-md:0 0 4px #00d4ff, 0 0 12px #00d4ff66;
-  --bg-deep:     #020b14;
-  --bg-panel:    #03111d;
-  --bg-card:     #041825;
-  --bg-input:    #041522;
-  --border:      #00d4ff33;
-  --border-md:   #00d4ff66;
-  --border-hi:   #00d4ffaa;
-  --text-main:   #b8f0ff;
-  --text-muted:  #5ba8c4;
-  --text-dim:    #2d6a82;
-  --ff:          'Times New Roman', Times, serif;
+  --neon-dim:    #0099bb;
+  --neon-glow:   0 0 8px #00d4ff88, 0 0 20px #00d4ff44;
+  --neon-glow-lg:0 0 12px #00d4ffaa, 0 0 30px #00d4ff66, 0 0 60px #00d4ff22;
+  --bg-deep:     #030508;
+  --bg-base:     #070b12;
+  --bg-card:     #0c1420;
+  --bg-glass:    rgba(0, 212, 255, 0.04);
+  --bg-hover:    rgba(0, 212, 255, 0.08);
+  --border:      rgba(0, 212, 255, 0.18);
+  --border-bright:rgba(0, 212, 255, 0.5);
+  --text-primary:#e8f4ff;
+  --text-muted:  #6a90a8;
+  --text-dim:    #3a5060;
+  --success:     #00ff9d;
+  --error:       #ff4466;
+  --warn:        #ffaa00;
 }
 
-/* ─── GLOBAL FONT & BACKGROUND ─────────────────────────────────────────── */
-*, *::before, *::after {
-  font-family: var(--ff) !important;
-  box-sizing: border-box;
-}
+/* ── Hide Streamlit Chrome ── */
+#MainMenu, footer, header,
+.stDeployButton,
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"] { display: none !important; }
 
-html, body,
-[data-testid="stApp"],
-[data-testid="stAppViewContainer"],
-.main, .block-container {
+/* ── Global Body ── */
+html, body, [data-testid="stAppViewContainer"] {
   background: var(--bg-deep) !important;
-  color: var(--text-main) !important;
+  font-family: 'Exo 2', sans-serif !important;
+  color: var(--text-primary) !important;
 }
 
-/* Animated grid background */
+[data-testid="stMain"] {
+  background: var(--bg-deep) !important;
+}
+
+/* Subtle grid background */
 [data-testid="stAppViewContainer"]::before {
   content: '';
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
   z-index: 0;
-  opacity: .35;
-  animation: gridPulse 6s ease-in-out infinite;
-}
-@keyframes gridPulse {
-  0%,100% { opacity:.25; }
-  50%      { opacity:.45; }
 }
 
-.block-container {
-  position: relative;
-  z-index: 1;
-  padding-top: 1.5rem !important;
-  max-width: 1200px !important;
-}
-
-/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
-::-webkit-scrollbar               { width:6px; height:6px; }
-::-webkit-scrollbar-track         { background:var(--bg-deep); }
-::-webkit-scrollbar-thumb         { background:var(--neon-dim); border-radius:3px; }
-::-webkit-scrollbar-thumb:hover   { background:var(--neon); }
-
-/* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
+/* ── Fixed Sidebar ── */
 [data-testid="stSidebar"] {
-  background: var(--bg-panel) !important;
-  border-right: 1px solid var(--border-md) !important;
-  box-shadow: 4px 0 30px #00d4ff18 !important;
-}
-[data-testid="stSidebar"] * { color: var(--text-main) !important; }
-[data-testid="stSidebar"] .stMarkdown h3,
-[data-testid="stSidebar"] h3 {
-  color: var(--neon) !important;
-  text-shadow: var(--neon-glow-md);
-  letter-spacing: .08em;
-  font-size: 1rem !important;
-}
-[data-testid="stSidebar"] hr { border-color: var(--border-md) !important; }
-
-/* ─── MAIN TITLE ────────────────────────────────────────────────────────── */
-h1 {
-  color: var(--neon) !important;
-  text-shadow: var(--neon-glow) !important;
-  font-size: 2rem !important;
-  letter-spacing: .12em !important;
-  font-style: italic;
-  animation: titleFlicker 8s ease-in-out infinite;
-}
-@keyframes titleFlicker {
-  0%,96%,100% { opacity:1; text-shadow: var(--neon-glow); }
-  97%         { opacity:.85; text-shadow: 0 0 4px #00d4ff; }
-  98%         { opacity:1; }
-  99%         { opacity:.9; }
-}
-h2, h3, h4 {
-  color: var(--neon) !important;
-  text-shadow: var(--neon-glow-md) !important;
-  letter-spacing: .06em;
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border) !important;
+  box-shadow: 4px 0 30px rgba(0,212,255,0.06) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  z-index: 999 !important;
 }
 
-/* ─── CAPTION / SMALL TEXT ──────────────────────────────────────────────── */
-.stCaption, [data-testid="stCaptionContainer"],
-small, caption { color: var(--text-muted) !important; font-style: italic; }
+[data-testid="stSidebar"] > div {
+  background: transparent !important;
+}
 
-/* ─── INPUTS ────────────────────────────────────────────────────────────── */
-[data-testid="stTextInput"] input,
-[data-testid="stTextArea"] textarea {
-  background: var(--bg-input) !important;
-  border: 1px solid var(--border-md) !important;
+[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+  padding: 1.2rem 0.9rem !important;
+}
+
+/* Scrollbar in sidebar */
+[data-testid="stSidebar"]::-webkit-scrollbar { width: 4px; }
+[data-testid="stSidebar"]::-webkit-scrollbar-track { background: transparent; }
+[data-testid="stSidebar"]::-webkit-scrollbar-thumb {
+  background: var(--neon-dim); border-radius: 4px;
+}
+
+/* ── Sidebar collapse button ── */
+[data-testid="stSidebarCollapseButton"] button {
+  color: var(--neon) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 {
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-primary) !important;
+}
+
+.stMarkdown p, .stMarkdown li {
+  color: var(--text-primary) !important;
+  font-family: 'Exo 2', sans-serif !important;
+}
+
+/* ── Dividers ── */
+hr {
+  border: none !important;
+  border-top: 1px solid var(--border) !important;
+  margin: 0.8rem 0 !important;
+}
+
+/* ── Labels ── */
+label, .stSelectbox label, .stSlider label,
+.stTextInput label, .stTextArea label,
+[data-testid="stWidgetLabel"] {
+  color: var(--neon) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Inputs ── */
+.stTextInput input, .stTextArea textarea,
+input[type="text"], input[type="password"] {
+  background: rgba(0,212,255,0.04) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 6px !important;
-  color: var(--neon-bright) !important;
-  caret-color: var(--neon) !important;
-  transition: border .25s, box-shadow .25s;
-  font-size: .95rem !important;
+  color: var(--text-primary) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.88rem !important;
+  transition: border-color 0.25s, box-shadow 0.25s !important;
 }
-[data-testid="stTextInput"] input:focus,
-[data-testid="stTextArea"] textarea:focus {
+
+.stTextInput input:focus, .stTextArea textarea:focus {
   border-color: var(--neon) !important;
-  box-shadow: var(--neon-glow-md) !important;
+  box-shadow: var(--neon-glow) !important;
   outline: none !important;
 }
-[data-testid="stTextInput"] input::placeholder,
-[data-testid="stTextArea"] textarea::placeholder { color: var(--text-dim) !important; }
 
-/* Label text above inputs */
-[data-testid="stTextInput"] label,
-[data-testid="stTextArea"] label,
-[data-testid="stSelectbox"] label,
-[data-testid="stSlider"] label,
-[data-testid="stCheckbox"] label {
-  color: var(--text-muted) !important;
-  font-size: .85rem !important;
-  letter-spacing: .04em;
+.stTextInput input::placeholder, .stTextArea textarea::placeholder {
+  color: var(--text-dim) !important;
 }
 
-/* ─── SELECTBOX ─────────────────────────────────────────────────────────── */
-[data-testid="stSelectbox"] > div > div {
-  background: var(--bg-input) !important;
-  border: 1px solid var(--border-md) !important;
+/* ── Selectbox ── */
+.stSelectbox [data-baseweb="select"] > div {
+  background: rgba(0,212,255,0.04) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 6px !important;
-  color: var(--neon-bright) !important;
-}
-[data-testid="stSelectbox"] > div > div:focus-within {
-  border-color: var(--neon) !important;
-  box-shadow: var(--neon-glow-md) !important;
-}
-/* Dropdown list */
-[data-testid="stSelectbox"] ul,
-[role="listbox"] {
-  background: var(--bg-panel) !important;
-  border: 1px solid var(--border-md) !important;
-}
-[data-testid="stSelectbox"] li,
-[role="option"] {
-  color: var(--text-main) !important;
-}
-[role="option"]:hover, [role="option"][aria-selected="true"] {
-  background: #00d4ff22 !important;
-  color: var(--neon) !important;
+  color: var(--text-primary) !important;
 }
 
-/* ─── SLIDER ────────────────────────────────────────────────────────────── */
-[data-testid="stSlider"] [role="slider"] {
-  background: var(--neon) !important;
-  box-shadow: var(--neon-glow-md) !important;
-}
-[data-testid="stSlider"] div[data-baseweb="slider"] > div:first-child {
-  background: var(--border-md) !important;
-}
-[data-testid="stSlider"] div[data-baseweb="slider"] > div:nth-child(2) {
-  background: var(--neon) !important;
-}
-[data-testid="stSlider"] p { color: var(--neon-bright) !important; }
-
-/* ─── CHECKBOX ──────────────────────────────────────────────────────────── */
-[data-testid="stCheckbox"] input[type="checkbox"] + div {
-  border-color: var(--neon-dim) !important;
-  background: var(--bg-input) !important;
-}
-[data-testid="stCheckbox"] input[type="checkbox"]:checked + div {
-  background: var(--neon) !important;
+.stSelectbox [data-baseweb="select"] > div:hover {
   border-color: var(--neon) !important;
-  box-shadow: var(--neon-glow-md) !important;
 }
 
-/* ─── BUTTONS ───────────────────────────────────────────────────────────── */
-[data-testid="stButton"] button {
-  background: transparent !important;
-  border: 1px solid var(--neon-dim) !important;
-  color: var(--neon) !important;
-  border-radius: 6px !important;
-  font-size: .85rem !important;
-  letter-spacing: .06em !important;
-  transition: all .25s !important;
-  text-shadow: 0 0 6px #00d4ff88;
-}
-[data-testid="stButton"] button:hover {
-  border-color: var(--neon) !important;
-  background: #00d4ff18 !important;
-  box-shadow: var(--neon-glow-md) !important;
-  color: var(--neon-bright) !important;
-  text-shadow: var(--neon-glow) !important;
-}
-/* Primary buttons */
-[data-testid="stButton"] button[kind="primary"] {
-  background: linear-gradient(135deg, #003d54, #005f7a) !important;
-  border: 1px solid var(--neon) !important;
-  box-shadow: var(--neon-glow-md) !important;
-  color: var(--neon-bright) !important;
-  font-weight: 700 !important;
-  letter-spacing: .08em !important;
-}
-[data-testid="stButton"] button[kind="primary"]:hover {
-  background: linear-gradient(135deg, #005f7a, #0099cc) !important;
+[data-baseweb="popover"] {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-bright) !important;
   box-shadow: var(--neon-glow) !important;
+}
+
+[role="option"] {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Exo 2', sans-serif !important;
+}
+
+[role="option"]:hover {
+  background: var(--bg-hover) !important;
+  color: var(--neon) !important;
+}
+
+/* ── Slider ── */
+.stSlider [data-baseweb="slider"] [role="slider"] {
+  background: var(--neon) !important;
+  box-shadow: var(--neon-glow) !important;
+}
+
+.stSlider [data-baseweb="slider"] [data-testid="stSliderTrack"] > div:first-child {
+  background: var(--border) !important;
+}
+
+.stSlider [data-baseweb="slider"] [data-testid="stSliderTrack"] > div:nth-child(2) {
+  background: var(--neon) !important;
+}
+
+/* ── Primary Button ── */
+.stButton > button[kind="primary"],
+button[data-testid="baseButton-primary"] {
+  background: transparent !important;
+  border: 1px solid var(--neon) !important;
+  color: var(--neon) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  border-radius: 6px !important;
+  box-shadow: var(--neon-glow) !important;
+  transition: all 0.2s !important;
+  padding: 0.45rem 1.2rem !important;
+}
+
+.stButton > button[kind="primary"]:hover,
+button[data-testid="baseButton-primary"]:hover {
+  background: rgba(0,212,255,0.12) !important;
+  box-shadow: var(--neon-glow-lg) !important;
   transform: translateY(-1px) !important;
 }
 
-/* ─── DOWNLOAD BUTTONS ──────────────────────────────────────────────────── */
-[data-testid="stDownloadButton"] {
-  position: relative !important;
-  z-index: 1 !important;
-}
-[data-testid="stDownloadButton"] button {
+/* ── Secondary / Default Button ── */
+.stButton > button[kind="secondary"],
+.stButton > button:not([kind]) {
   background: transparent !important;
-  border: 1px solid var(--neon-dim) !important;
-  color: var(--neon) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
   border-radius: 6px !important;
-  transition: all .25s !important;
-  width: 100% !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-[data-testid="stDownloadButton"] button:hover {
-  background: #00d4ff18 !important;
-  box-shadow: var(--neon-glow-md) !important;
-  border-color: var(--neon) !important;
-}
-/* Fix anchor tag inside download button that causes text doubling */
-[data-testid="stDownloadButton"] button a,
-[data-testid="stDownloadButton"] a {
-  color: var(--neon) !important;
-  text-decoration: none !important;
-  position: static !important;
-  display: contents !important;
+  transition: all 0.2s !important;
 }
 
-/* ─── TABS ──────────────────────────────────────────────────────────────── */
-[data-testid="stTabs"] [role="tablist"] {
-  border-bottom: 1px solid var(--border-md) !important;
-  gap: 2px;
+.stButton > button[kind="secondary"]:hover,
+.stButton > button:not([kind]):hover {
+  border-color: var(--neon) !important;
+  color: var(--neon) !important;
+  background: var(--bg-hover) !important;
 }
-[data-testid="stTabs"] button[role="tab"] {
+
+/* ── Download Button ── */
+.stDownloadButton > button {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+.stDownloadButton > button:hover {
+  border-color: var(--neon) !important;
+  color: var(--neon) !important;
+  background: var(--bg-hover) !important;
+}
+
+/* ── Checkbox ── */
+.stCheckbox label span {
+  color: var(--text-muted) !important;
+  font-size: 0.88rem !important;
+  font-family: 'Exo 2', sans-serif !important;
+}
+
+[data-testid="stCheckbox"] svg { stroke: var(--neon) !important; }
+
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {
+  background: transparent !important;
+  border-bottom: 1px solid var(--border) !important;
+  gap: 0.2rem !important;
+}
+
+.stTabs [data-baseweb="tab"] {
   background: transparent !important;
   color: var(--text-muted) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  border: none !important;
+  padding: 0.5rem 1.1rem !important;
   border-radius: 6px 6px 0 0 !important;
-  border: 1px solid transparent !important;
-  border-bottom: none !important;
-  font-size: .88rem !important;
-  letter-spacing: .05em;
-  transition: all .2s;
-}
-[data-testid="stTabs"] button[role="tab"]:hover {
-  color: var(--neon) !important;
-  background: #00d4ff0a !important;
-}
-[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-  color: var(--neon) !important;
-  background: var(--bg-card) !important;
-  border-color: var(--border-md) !important;
-  border-bottom-color: var(--bg-card) !important;
-  text-shadow: var(--neon-glow-md) !important;
-  box-shadow: 0 -2px 12px #00d4ff22 !important;
+  transition: all 0.2s !important;
 }
 
-/* ─── EXPANDER CONTAINER ─────────────────────────────────────────────────── */
-[data-testid="stExpander"] {
-  border: 1px solid var(--border) !important;
-  border-radius: 8px !important;
-  background: var(--bg-card) !important;
-  position: relative !important;
-  z-index: 1 !important;
-  overflow: visible !important;
-  margin-top: 8px !important;
-}
-[data-testid="stExpander"] summary {
-  color: var(--neon-dim) !important;
-}
-[data-testid="stExpander"] summary:hover {
+.stTabs [data-baseweb="tab"]:hover {
   color: var(--neon) !important;
+  background: var(--bg-hover) !important;
 }
 
-/* ─── CHAT MESSAGES ─────────────────────────────────────────────────────── */
+.stTabs [aria-selected="true"] {
+  color: var(--neon) !important;
+  background: rgba(0,212,255,0.08) !important;
+  border-bottom: 2px solid var(--neon) !important;
+  text-shadow: 0 0 10px var(--neon) !important;
+}
+
+.stTabs [data-baseweb="tab-panel"] {
+  background: transparent !important;
+  padding: 1rem 0 !important;
+}
+
+/* ── Chat Messages ── */
 [data-testid="stChatMessage"] {
-  background: var(--bg-card) !important;
+  background: var(--bg-glass) !important;
   border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  margin-bottom: .5rem !important;
-  animation: msgAppear .3s ease;
+  margin-bottom: 0.5rem !important;
+  padding: 0.6rem 0.8rem !important;
+  transition: border-color 0.2s !important;
 }
-@keyframes msgAppear {
-  from { opacity:0; transform:translateY(6px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-/* User messages */
-[data-testid="stChatMessage"][data-testid*="user"],
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-  border-color: var(--neon-dim) !important;
-  background: #04202e !important;
-}
-/* AI messages */
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-  border-color: #00d4ff44 !important;
-  background: #03141e !important;
-}
-[data-testid="stChatMessage"] p,
-[data-testid="stChatMessage"] .stMarkdown { color: var(--text-main) !important; }
 
-/* ─── STCONTAINER (chat area) ───────────────────────────────────────────── */
+[data-testid="stChatMessage"]:hover {
+  border-color: rgba(0,212,255,0.3) !important;
+}
+
+[data-testid="stChatMessage"][data-testid*="user"] {
+  border-left: 2px solid var(--neon) !important;
+}
+
+.stChatMessage p {
+  color: var(--text-primary) !important;
+  font-family: 'Exo 2', sans-serif !important;
+}
+
+/* ── Container (chat box) ── */
 [data-testid="stVerticalBlockBorderWrapper"] {
-  background: var(--bg-panel) !important;
-  border: 1px solid var(--border-md) !important;
+  background: rgba(0,212,255,0.02) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  box-shadow: inset 0 0 30px #00d4ff08, 0 0 20px #00d4ff11 !important;
 }
 
-/* ─── SPINNER ───────────────────────────────────────────────────────────── */
-[data-testid="stSpinner"] p { color: var(--neon-dim) !important; font-style: italic; }
-[data-testid="stSpinner"] svg circle { stroke: var(--neon) !important; }
+/* ── Expander ── */
+.streamlit-expanderHeader {
+  background: var(--bg-glass) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--neon) !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 0.06em !important;
+}
 
-/* ─── ALERT / INFO / SUCCESS / ERROR ────────────────────────────────────── */
-[data-testid="stAlert"] {
+.streamlit-expanderHeader:hover {
+  border-color: var(--neon) !important;
+  background: var(--bg-hover) !important;
+}
+
+.streamlit-expanderContent {
   background: var(--bg-card) !important;
-  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  border-top: none !important;
+  border-radius: 0 0 6px 6px !important;
 }
-[data-testid="stAlert"][data-baseweb="notification"][kind="info"],
+
+/* ── Spinner ── */
+.stSpinner > div {
+  border-top-color: var(--neon) !important;
+}
+
+/* ── Alerts ── */
+.stSuccess {
+  background: rgba(0,255,157,0.08) !important;
+  border: 1px solid rgba(0,255,157,0.3) !important;
+  border-radius: 6px !important;
+  color: var(--success) !important;
+}
+
+.stError {
+  background: rgba(255,68,102,0.08) !important;
+  border: 1px solid rgba(255,68,102,0.3) !important;
+  border-radius: 6px !important;
+  color: var(--error) !important;
+}
+
+.stWarning {
+  background: rgba(255,170,0,0.08) !important;
+  border: 1px solid rgba(255,170,0,0.3) !important;
+  border-radius: 6px !important;
+  color: var(--warn) !important;
+}
+
 .stInfo {
-  border: 1px solid #00d4ff55 !important;
-  background: #011f2e !important;
+  background: rgba(0,212,255,0.06) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
   color: var(--neon) !important;
 }
-[data-testid="stAlert"][kind="success"], .stSuccess {
-  border: 1px solid #00ff9955 !important;
-  background: #011e11 !important;
-  color: #66ffbb !important;
-}
-[data-testid="stAlert"][kind="error"], .stError {
-  border: 1px solid #ff335566 !important;
-  background: #1e0305 !important;
-  color: #ff8899 !important;
-}
-[data-testid="stAlert"] p { color: inherit !important; }
 
-/* ─── DIVIDER ───────────────────────────────────────────────────────────── */
-hr { border-color: var(--border-md) !important; }
+/* ── Caption / helper text ── */
+.stCaption, small, .stMarkdown small {
+  color: var(--text-dim) !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.75rem !important;
+}
 
-/* ─── CODE BLOCKS ───────────────────────────────────────────────────────── */
-code, pre {
-  background: #041018 !important;
-  color: var(--neon-bright) !important;
+/* ── Sidebar Header ── */
+.sidebar-username {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(0,212,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--neon);
+  letter-spacing: 0.08em;
+}
+
+.sidebar-section {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.3rem 0;
+  margin-top: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Session buttons in sidebar ── */
+.session-btn {
+  background: transparent !important;
   border: 1px solid var(--border) !important;
-  border-radius: 4px !important;
+  border-radius: 6px !important;
 }
 
-/* ─── STMARKDOWN general ────────────────────────────────────────────────── */
-.stMarkdown p, .stMarkdown li, .stMarkdown span { color: var(--text-main) !important; }
-.stMarkdown a { color: var(--neon) !important; text-decoration: underline; }
-
-/* ─── SECTION CONTAINER ─────────────────────────────────────────────────── */
-section.main { background: var(--bg-deep) !important; }
-
-/* ─── PASSWORD STRENGTH BAR FIX ─────────────────────────────────────────── */
-.strength-bar-bg   { background:#041825 !important; border:1px solid var(--border) !important; }
-
-/* ─── COLUMN / BUTTON LAYOUT — no overlap ───────────────────────────────── */
-[data-testid="column"] {
-  min-width: 0 !important;
-  overflow: visible !important;
+.session-active {
+  border-color: var(--neon) !important;
+  background: rgba(0,212,255,0.07) !important;
+  color: var(--neon) !important;
+  box-shadow: var(--neon-glow) !important;
 }
-[data-testid="stButton"],
-[data-testid="stDownloadButton"] {
-  position: relative !important;
-  z-index: 1 !important;
-  display: block !important;
-  width: 100% !important;
+
+/* ── Page title ── */
+.page-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--neon);
+  text-shadow: var(--neon-glow);
+  margin: 0;
 }
-[data-testid="stButton"] button,
-[data-testid="stDownloadButton"] button {
-  position: relative !important;
-  width: 100% !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+
+.page-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  margin-top: 0.1rem;
 }
-/* Sidebar session rows: delete icon won't overlap session name */
-[data-testid="stSidebar"] [data-testid="column"] {
-  padding: 0 2px !important;
-  align-items: center !important;
+
+/* ── Auth page ── */
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem 1.8rem;
+  box-shadow: 0 0 40px rgba(0,212,255,0.06);
 }
-/* Send button column stays compact */
-[data-testid="stHorizontalBlock"] [data-testid="column"]:last-child {
-  flex: 0 0 auto !important;
-  min-width: 82px !important;
+
+.auth-logo {
+  text-align: center;
+  font-size: 3.5rem;
+  margin-bottom: 0.3rem;
+  filter: drop-shadow(0 0 12px var(--neon));
 }
-/* Row containers */
-[data-testid="stHorizontalBlock"] {
-  gap: 6px !important;
-  align-items: flex-end !important;
-  flex-wrap: nowrap !important;
+
+.auth-title {
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--neon);
+  text-shadow: var(--neon-glow);
+  margin-bottom: 0.15rem;
 }
-</style>
-"""
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  AUTH PAGE CSS — extended for neon theme
-# ══════════════════════════════════════════════════════════════════════════════
+.auth-sub {
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.4rem;
+}
 
-_AUTH_CSS = """
-<style>
-  /* sidebar visible on all pages */
+.strength-bar-bg {
+  background: #111820;
+  border-radius: 4px;
+  height: 4px;
+  width: 100%;
+  margin: 4px 0 2px;
+}
 
-  .auth-logo {
-    text-align:center;
-    font-size:3.8rem;
-    margin-bottom:.4rem;
-    animation: logoPulse 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 12px #00d4ff);
-  }
-  @keyframes logoPulse {
-    0%,100% { filter: drop-shadow(0 0 12px #00d4ff); }
-    50%      { filter: drop-shadow(0 0 24px #00d4ff) drop-shadow(0 0 40px #00d4ff66); }
-  }
+.strength-bar-fill {
+  height: 4px;
+  border-radius: 4px;
+  transition: width .4s, background .4s;
+}
 
-  .auth-title {
-    text-align:center;
-    font-size:2rem;
-    font-weight:700;
-    font-style:italic;
-    color:#00d4ff;
-    text-shadow: 0 0 8px #00d4ff, 0 0 20px #00d4ff55, 0 0 40px #00d4ff22;
-    margin-bottom:.25rem;
-    letter-spacing:.12em;
-    animation: titleFlicker 8s ease-in-out infinite;
-  }
-  @keyframes titleFlicker {
-    0%,96%,100% { opacity:1; }
-    97%         { opacity:.8; }
-    99%         { opacity:.93; }
-  }
+.hint-pill {
+  display: inline-block;
+  background: rgba(0,212,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: .75rem;
+  color: var(--text-dim);
+  margin: 2px 2px;
+  font-family: 'Share Tech Mono', monospace;
+}
 
-  .auth-sub {
-    text-align:center;
-    color:#5ba8c4;
-    font-size:.9rem;
-    font-style:italic;
-    margin-bottom:1.4rem;
-    letter-spacing:.06em;
-  }
+.hint-ok {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(0,255,157,0.05);
+}
 
-  .strength-bar-bg   {
-    background:#041825;
-    border:1px solid #00d4ff33;
-    border-radius:6px;
-    height:7px;
-    width:100%;
-    margin:5px 0 3px;
-    overflow:hidden;
-  }
-  .strength-bar-fill {
-    height:7px;
-    border-radius:6px;
-    box-shadow: 0 0 8px currentColor;
-    transition: width .4s ease, background .4s ease;
-  }
+.info-box {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .55rem 1rem;
+  font-size: .8rem;
+  color: var(--text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  margin-top: .8rem;
+  text-align: center;
+}
 
-  .hint-pill {
-    display:inline-block;
-    background:#03111d;
-    border:1px solid #00d4ff33;
-    border-radius:20px;
-    padding:3px 11px;
-    font-size:.78rem;
-    color:#5ba8c4;
-    margin:3px 3px;
-    letter-spacing:.04em;
-    transition: all .2s;
-  }
-  .hint-ok {
-    border-color:#00ff99;
-    color:#00ff99;
-    background:#011e11;
-    box-shadow: 0 0 6px #00ff9944;
-  }
+.warn-box {
+  background: rgba(255,68,102,0.06);
+  border: 1px solid rgba(255,68,102,0.3);
+  border-radius: 6px;
+  padding: .55rem 1rem;
+  font-size: .8rem;
+  color: #ff8899;
+  margin-top: .8rem;
+  text-align: center;
+}
 
-  .info-box {
-    background:#011f2e;
-    border:1px solid #00d4ff44;
-    border-radius:8px;
-    padding:.65rem 1rem;
-    font-size:.83rem;
-    color:#66ccee;
-    margin-top:.9rem;
-    text-align:center;
-    box-shadow: 0 0 12px #00d4ff11;
-  }
+.otp-box {
+  background: rgba(0,255,157,0.05);
+  border: 1px solid rgba(0,255,157,0.25);
+  border-radius: 6px;
+  padding: .6rem 1rem;
+  font-size: .82rem;
+  color: #80ffcc;
+  margin: .6rem 0;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+}
 
-  .warn-box {
-    background:#1a0505;
-    border:1px solid #ff335544;
-    border-radius:8px;
-    padding:.65rem 1rem;
-    font-size:.83rem;
-    color:#ff8899;
-    margin-top:.9rem;
-    text-align:center;
-  }
+/* ── Empty chat message ── */
+.empty-chat {
+  text-align: center;
+  color: var(--text-dim);
+  padding-top: 80px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
 
-  .otp-box {
-    background:#01200e;
-    border:1px solid #00ff9966;
-    border-radius:8px;
-    padding:.75rem 1rem;
-    font-size:.86rem;
-    color:#66ffbb;
-    margin:.7rem 0;
-    text-align:center;
-    box-shadow: 0 0 12px #00ff9911;
-  }
+/* ── Scrollbar globally ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon-dim); }
+
+/* ── Sidebar auth hide ── */
+section[data-testid="stSidebar"].auth-hidden { display:none !important; }
 </style>
 """
 
@@ -606,7 +621,7 @@ _AUTH_CSS = """
 #  GOOGLE SHEETS CONNECTION
 # ══════════════════════════════════════════════════════════════════════════════
 
-@st.cache_resource(show_spinner="🔗 Connecting to Google Sheets …")
+@st.cache_resource(show_spinner="Connecting to database …")
 def get_spreadsheet():
     creds  = Credentials.from_service_account_info(
         st.secrets["gcp_service_account"], scopes=SCOPES
@@ -710,7 +725,7 @@ def update_password(username: str, new_password: str):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  PASSWORD RESET  (OTP via email)
+#  PASSWORD RESET
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _generate_otp(length: int = 6) -> str:
@@ -722,26 +737,17 @@ def send_reset_email(to_email: str, otp: str) -> bool:
         smtp_email = st.secrets["SMTP_EMAIL"]
         smtp_pass  = st.secrets["SMTP_PASSWORD"]
     except KeyError:
-        st.error("⚠️  SMTP credentials not found in Streamlit Secrets "
-                 "(SMTP_EMAIL / SMTP_PASSWORD).")
+        st.error("SMTP credentials not configured.")
         return False
 
-    subject = "🔐 Your Password Reset Code — Groq AI Chatbot"
+    subject = "Password Reset Code — Groq AI Chatbot"
     body    = f"""
-Hi,
+Your one-time password reset code:
 
-You requested a password reset for your Groq AI Chatbot account.
+    {otp}
 
-Your one-time code is:
-
-    ┌─────────────┐
-    │   {otp}    │
-    └─────────────┘
-
-This code expires in 10 minutes.
-If you did not request this, please ignore this email.
-
-— Groq AI Chatbot
+Expires in 10 minutes.
+If you did not request this, ignore this email.
     """.strip()
 
     msg = MIMEMultipart("alternative")
@@ -756,7 +762,7 @@ If you did not request this, please ignore this email.
             server.sendmail(smtp_email, to_email, msg.as_string())
         return True
     except Exception as e:
-        st.error(f"❌  Email send failed: {e}")
+        st.error(f"Email error: {e}")
         return False
 
 
@@ -890,7 +896,7 @@ def clear_session_messages(username: str, sid: str):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  LANGCHAIN BRIDGE + LLM
+#  LANGCHAIN + LLM
 # ══════════════════════════════════════════════════════════════════════════════
 
 def get_lc_mem(username: str, sid: str) -> InMemoryChatMessageHistory:
@@ -933,15 +939,15 @@ def generate_response(username: str, sid: str, user_input: str,
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  VALIDATION HELPERS
+#  VALIDATION
 # ══════════════════════════════════════════════════════════════════════════════
 
 def validate_username(username: str):
     u = username.strip()
     if not u:                                   return "Username cannot be empty."
-    if len(u) < 3:                              return "Username must be at least 3 characters."
-    if len(u) > 32:                             return "Username must be 32 characters or fewer."
-    if not re.match(r"^[a-zA-Z0-9_.\-]+$", u): return "Only letters, numbers, _ . - allowed."
+    if len(u) < 3:                              return "At least 3 characters required."
+    if len(u) > 32:                             return "Max 32 characters."
+    if not re.match(r"^[a-zA-Z0-9_.\-]+$", u): return "Letters, numbers, _ . - only."
     return None
 
 
@@ -950,13 +956,13 @@ def validate_email(email: str):
     if not e:
         return "Email cannot be empty."
     if not re.match(r"^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$", e):
-        return "Enter a valid email (e.g. name@example.com)."
+        return "Enter a valid email address."
     return None
 
 
 def validate_password(password: str):
     if not password:                           return "Password cannot be empty."
-    if len(password) < 6:                      return "Password must be at least 6 characters."
+    if len(password) < 6:                      return "Minimum 6 characters."
     if not re.search(r"[A-Za-z]", password):  return "Must contain at least one letter."
     if not re.search(r"[0-9]", password):      return "Must contain at least one number."
     return None
@@ -969,97 +975,78 @@ def password_strength(password: str):
     if re.search(r"[A-Z]", password):        score += 1
     if re.search(r"[^A-Za-z0-9]", password): score += 1
     labels = {0: "Very Weak", 1: "Weak", 2: "Fair", 3: "Strong", 4: "Very Strong"}
-    colors = {0: "#ff3355", 1: "#ff8c00", 2: "#ffd700", 3: "#00d4ff", 4: "#00ff99"}
+    colors = {0: "#ff4466", 1: "#ff8800", 2: "#ffcc00", 3: "#00d4ff", 4: "#00ff9d"}
     return score, labels[score], colors[score]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SIGN IN PANEL
+#  SIGN IN
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _signin_panel():
     st.markdown("")
-    un = st.text_input("👤  Username", key="si_un", placeholder="your-username")
-    pw = st.text_input("🔒  Password", key="si_pw", type="password",
-                       placeholder="••••••••")
+    un = st.text_input("Username", key="si_un", placeholder="your-username")
+    pw = st.text_input("Password", key="si_pw", type="password", placeholder="••••••••")
     st.markdown("")
 
-    if st.button("Sign In  →", type="primary",
-                 use_container_width=True, key="btn_signin"):
+    if st.button("Sign In  ⟶", type="primary", use_container_width=True, key="btn_signin"):
         u = un.strip()
-
         if not u or not pw:
-            st.error("⚠️  Please fill in both fields.")
+            st.error("Please fill in both fields.")
         elif not user_exists(u):
-            st.error("❌  User not found. Please sign up first.")
+            st.error("User not found. Please sign up first.")
             st.markdown(
-                "<div class='warn-box'>"
-                "🆕 No account with that username. "
-                "Switch to the <b>Sign Up</b> tab to create one."
-                "</div>",
+                "<div class='warn-box'>No account with that username — switch to Sign Up.</div>",
                 unsafe_allow_html=True,
             )
         elif not auth_user(u, pw):
-            st.error("🔑  Incorrect password. Please try again.")
+            st.error("Incorrect password.")
             st.markdown(
-                "<div class='info-box'>"
-                "Forgot your password? Use the <b>Forgot Password</b> tab →"
-                "</div>",
+                "<div class='info-box'>Forgot your password? Use the Forgot Password tab →</div>",
                 unsafe_allow_html=True,
             )
         else:
             st.session_state.logged_in = True
             st.session_state.username  = u
-            st.success(f"✅  Welcome back, **{u}**!")
-            time.sleep(0.6)
+            st.success(f"Welcome back, {u}!")
+            time.sleep(0.5)
             st.rerun()
 
     st.markdown(
-        "<div class='info-box'>No account yet? Switch to <b>Sign Up</b> · "
-        "Forgot password? Use <b>Forgot Password</b></div>",
+        "<div class='info-box'>No account? Switch to Sign Up tab</div>",
         unsafe_allow_html=True,
     )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  SIGN UP PANEL
+#  SIGN UP
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _signup_panel():
     st.markdown("")
-    full_name = st.text_input("🙂  Full Name", key="su_name",
-                              placeholder="Enter Your Full Name")
+    full_name = st.text_input("Full Name", key="su_name", placeholder="Your Full Name")
 
-    su_un = st.text_input("👤  Username", key="su_un",
-                          placeholder="3–32 chars · letters / numbers / _ . -")
+    su_un = st.text_input("Username", key="su_un", placeholder="3–32 chars · letters / numbers / _ . -")
     if su_un:
         err = validate_username(su_un)
         if err:
-            st.markdown(f"<span style='color:#ff3355;font-size:.82rem'>⚠ {err}</span>",
-                        unsafe_allow_html=True)
+            st.markdown(f"<span style='color:#ff4466;font-size:.8rem'>⚠ {err}</span>", unsafe_allow_html=True)
         elif user_exists(su_un.strip()):
-            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
-                        "⚠ Username already taken.</span>", unsafe_allow_html=True)
+            st.markdown("<span style='color:#ff4466;font-size:.8rem'>⚠ Username already taken.</span>", unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>"
-                        "✔ Username available!</span>", unsafe_allow_html=True)
+            st.markdown("<span style='color:#00ff9d;font-size:.8rem'>✔ Available</span>", unsafe_allow_html=True)
 
-    su_email = st.text_input("📧  Email", key="su_email",
-                             placeholder="you@example.com")
+    su_email = st.text_input("Email", key="su_email", placeholder="you@example.com")
     if su_email:
         e_err = validate_email(su_email)
         if e_err:
-            st.markdown(f"<span style='color:#ff3355;font-size:.82rem'>⚠ {e_err}</span>",
-                        unsafe_allow_html=True)
+            st.markdown(f"<span style='color:#ff4466;font-size:.8rem'>⚠ {e_err}</span>", unsafe_allow_html=True)
         elif email_exists(su_email.strip()):
-            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
-                        "⚠ Email already registered.</span>", unsafe_allow_html=True)
+            st.markdown("<span style='color:#ff4466;font-size:.8rem'>⚠ Email already registered.</span>", unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>"
-                        "✔ Email available!</span>", unsafe_allow_html=True)
+            st.markdown("<span style='color:#00ff9d;font-size:.8rem'>✔ Available</span>", unsafe_allow_html=True)
 
-    su_pw1 = st.text_input("🔒  Password", type="password", key="su_pw1",
-                           placeholder="min 6 chars, letter + number")
+    su_pw1 = st.text_input("Password", type="password", key="su_pw1", placeholder="min 6 chars, letter + number")
     if su_pw1:
         score, label, color = password_strength(su_pw1)
         pct        = int((score / 4) * 100)
@@ -1071,58 +1058,44 @@ def _signup_panel():
             return f"<span class='{cls}'>{'✔' if ok else '·'} {text}</span>"
         st.markdown(
             f"<div class='strength-bar-bg'>"
-            f"<div class='strength-bar-fill' style='width:{pct}%;background:{color};box-shadow:0 0 8px {color}'></div>"
-            f"</div><span style='color:{color};font-size:.78rem;text-shadow:0 0 6px {color}88'>"
+            f"<div class='strength-bar-fill' style='width:{pct}%;background:{color}'></div>"
+            f"</div><span style='color:{color};font-size:.78rem;font-family:\"Share Tech Mono\",monospace'>"
             f"Strength: <b>{label}</b></span><br>"
-            + pill("6+ chars", has_len)
-            + pill("Letter",   has_letter)
-            + pill("Number",   has_digit),
+            + pill("6+ chars", has_len) + pill("Letter", has_letter) + pill("Number", has_digit),
             unsafe_allow_html=True,
         )
 
-    su_pw2 = st.text_input("🔒  Confirm Password", type="password", key="su_pw2",
-                           placeholder="Re-enter your password")
+    su_pw2 = st.text_input("Confirm Password", type="password", key="su_pw2", placeholder="Re-enter password")
     if su_pw2 and su_pw1:
         if su_pw1 == su_pw2:
-            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>✔ Passwords match</span>",
-                        unsafe_allow_html=True)
+            st.markdown("<span style='color:#00ff9d;font-size:.8rem'>✔ Passwords match</span>", unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
-                        "⚠ Passwords do not match</span>", unsafe_allow_html=True)
+            st.markdown("<span style='color:#ff4466;font-size:.8rem'>⚠ Passwords do not match</span>", unsafe_allow_html=True)
 
     st.markdown("")
     agree = st.checkbox("I agree to the Terms of Service", key="su_agree")
     st.markdown("")
 
-    if st.button("Create Account  →", type="primary",
-                 use_container_width=True, key="btn_signup"):
+    if st.button("Create Account  ⟶", type="primary", use_container_width=True, key="btn_signup"):
         u     = su_un.strip()
         email = su_email.strip()
-        p1    = su_pw1
-        p2    = su_pw2
+        p1, p2 = su_pw1, su_pw2
 
         err = validate_username(u)
-        if err:
-            st.error(f"⚠️  {err}")
-        elif user_exists(u):
-            st.error("❌  Username already taken.")
-        elif validate_email(email):
-            st.error(f"⚠️  {validate_email(email)}")
-        elif email_exists(email):
-            st.error("❌  Email already registered.")
+        if err:                       st.error(f"⚠ {err}")
+        elif user_exists(u):          st.error("Username already taken.")
+        elif validate_email(email):   st.error(validate_email(email))
+        elif email_exists(email):     st.error("Email already registered.")
         else:
             perr = validate_password(p1)
-            if perr:
-                st.error(f"⚠️  {perr}")
-            elif p1 != p2:
-                st.error("⚠️  Passwords do not match.")
-            elif not agree:
-                st.error("⚠️  Please accept the Terms of Service.")
+            if perr:         st.error(f"⚠ {perr}")
+            elif p1 != p2:   st.error("Passwords do not match.")
+            elif not agree:  st.error("Please accept the Terms of Service.")
             else:
-                with st.spinner("Creating your account …"):
+                with st.spinner("Creating account …"):
                     ok = reg_user(u, p1, full_name.strip(), email)
                 if ok:
-                    st.success(f"🎉  Account created! Welcome, **{u}**.")
+                    st.success(f"Account created! Welcome, {u}.")
                     st.session_state.logged_in = True
                     st.session_state.username  = u
                     time.sleep(0.8)
@@ -1132,33 +1105,28 @@ def _signup_panel():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  FORGOT PASSWORD PANEL
+#  FORGOT PASSWORD
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _forgot_password_panel():
     st.markdown("")
-
     if "fp_step" not in st.session_state:
         st.session_state.fp_step     = 1
         st.session_state.fp_email    = ""
         st.session_state.fp_username = ""
 
     if st.session_state.fp_step == 1:
-        st.markdown("#### 📧 Enter your registered email")
-        st.caption("We'll send a 6-digit reset code to your inbox.")
+        st.markdown("##### Enter your registered email")
+        st.caption("A 6-digit reset code will be sent to your inbox.")
         st.markdown("")
-
-        fp_email = st.text_input("Email address", key="fp_email_input",
-                                 placeholder="you@example.com")
-
-        if st.button("Send Reset Code  →", type="primary",
-                     use_container_width=True, key="btn_send_otp"):
+        fp_email = st.text_input("Email address", key="fp_email_input", placeholder="you@example.com")
+        if st.button("Send Reset Code  ⟶", type="primary", use_container_width=True, key="btn_send_otp"):
             email = fp_email.strip()
             e_err = validate_email(email)
             if e_err:
-                st.error(f"⚠️  {e_err}")
+                st.error(f"⚠ {e_err}")
             elif not email_exists(email):
-                st.success("✅  If that email is registered, a reset code has been sent.")
+                st.success("If that email is registered, a code has been sent.")
             else:
                 username = get_username_by_email(email)
                 otp      = _generate_otp()
@@ -1169,110 +1137,91 @@ def _forgot_password_panel():
                     st.session_state.fp_step     = 2
                     st.session_state.fp_email    = email
                     st.session_state.fp_username = username
-                    st.success("✅  Reset code sent! Check your inbox.")
+                    st.success("Reset code sent! Check your inbox.")
                     time.sleep(0.8)
                     st.rerun()
-
-        st.markdown(
-            "<div class='info-box'>Remembered your password? Go back to <b>Sign In →</b></div>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<div class='info-box'>Remembered it? Go back to Sign In</div>", unsafe_allow_html=True)
 
     elif st.session_state.fp_step == 2:
         email = st.session_state.fp_email
-        st.markdown(f"#### 🔐 Reset password for `{email}`")
+        st.markdown(f"##### Reset for `{email}`")
         st.markdown(
-            "<div class='otp-box'>📬 A 6-digit code was sent to your email. "
-            "It expires in <b>10 minutes</b>.</div>",
+            "<div class='otp-box'>📬 6-digit code sent · expires in <b>10 min</b></div>",
             unsafe_allow_html=True,
         )
         st.markdown("")
-
-        otp_input = st.text_input("6-digit Code", key="fp_otp_input",
-                                  placeholder="e.g. 483920", max_chars=6)
-        new_pw1   = st.text_input("🔒  New Password", type="password",
-                                  key="fp_pw1", placeholder="min 6 chars, letter + number")
+        otp_input = st.text_input("6-digit Code", key="fp_otp_input", placeholder="e.g. 483920", max_chars=6)
+        new_pw1   = st.text_input("New Password", type="password", key="fp_pw1", placeholder="min 6 chars, letter + number")
         if new_pw1:
             score, label, color = password_strength(new_pw1)
             pct = int((score / 4) * 100)
             st.markdown(
                 f"<div class='strength-bar-bg'>"
-                f"<div class='strength-bar-fill' style='width:{pct}%;background:{color};box-shadow:0 0 8px {color}'></div>"
-                f"</div><span style='color:{color};font-size:.78rem;text-shadow:0 0 6px {color}88'>"
-                f"Strength: <b>{label}</b></span>",
+                f"<div class='strength-bar-fill' style='width:{pct}%;background:{color}'></div>"
+                f"</div><span style='color:{color};font-size:.78rem'>Strength: <b>{label}</b></span>",
                 unsafe_allow_html=True,
             )
-
-        new_pw2 = st.text_input("🔒  Confirm New Password", type="password",
-                                key="fp_pw2", placeholder="Re-enter new password")
+        new_pw2 = st.text_input("Confirm New Password", type="password", key="fp_pw2", placeholder="Re-enter")
         if new_pw2 and new_pw1:
             if new_pw1 == new_pw2:
-                st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>✔ Passwords match</span>",
-                            unsafe_allow_html=True)
+                st.markdown("<span style='color:#00ff9d;font-size:.8rem'>✔ Passwords match</span>", unsafe_allow_html=True)
             else:
-                st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
-                            "⚠ Passwords do not match</span>", unsafe_allow_html=True)
+                st.markdown("<span style='color:#ff4466;font-size:.8rem'>⚠ Passwords do not match</span>", unsafe_allow_html=True)
 
         st.markdown("")
         col_reset, col_back = st.columns([3, 1])
-
         with col_reset:
-            if st.button("Reset Password  →", type="primary",
-                         use_container_width=True, key="btn_reset_pw"):
+            if st.button("Reset Password  ⟶", type="primary", use_container_width=True, key="btn_reset_pw"):
                 otp      = otp_input.strip()
                 username = st.session_state.fp_username
-
                 if not otp:
-                    st.error("⚠️  Please enter the reset code.")
+                    st.error("Please enter the reset code.")
                 else:
                     result = verify_otp(email, otp)
                     if result == "invalid":
-                        st.error("❌  Invalid reset code. Please check and try again.")
+                        st.error("Invalid code. Check and retry.")
                     elif result == "expired":
-                        st.error("❌  This code has expired. Please request a new one.")
-                        st.session_state.fp_step = 1
-                        st.rerun()
+                        st.error("Code expired. Request a new one.")
+                        st.session_state.fp_step = 1; st.rerun()
                     elif result == "used":
-                        st.error("❌  This code has already been used. Please request a new one.")
-                        st.session_state.fp_step = 1
-                        st.rerun()
+                        st.error("Code already used. Request a new one.")
+                        st.session_state.fp_step = 1; st.rerun()
                     else:
                         perr = validate_password(new_pw1)
-                        if perr:
-                            st.error(f"⚠️  {perr}")
-                        elif new_pw1 != new_pw2:
-                            st.error("⚠️  Passwords do not match.")
+                        if perr:        st.error(f"⚠ {perr}")
+                        elif new_pw1 != new_pw2: st.error("Passwords do not match.")
                         else:
                             consume_otp(email, otp)
                             update_password(username, new_pw1)
-                            st.success("✅  Password reset successfully! You can now sign in.")
+                            st.success("Password reset! You can now sign in.")
                             for k in ["fp_step", "fp_email", "fp_username"]:
                                 st.session_state.pop(k, None)
-                            time.sleep(1.2)
-                            st.rerun()
-
+                            time.sleep(1.2); st.rerun()
         with col_back:
             if st.button("← Resend", use_container_width=True, key="btn_fp_back"):
-                st.session_state.fp_step = 1
-                st.rerun()
+                st.session_state.fp_step = 1; st.rerun()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  LOGIN / AUTH PAGE
+#  LOGIN PAGE
 # ══════════════════════════════════════════════════════════════════════════════
 
 def login_page():
-    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
-    st.markdown(_AUTH_CSS,  unsafe_allow_html=True)
-    _, col, _ = st.columns([1, 1.5, 1])
+    # Hide sidebar on login
+    st.markdown(
+        "<style>section[data-testid='stSidebar']{display:none!important}</style>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(NEON_CSS, unsafe_allow_html=True)
+    _, col, _ = st.columns([1, 1.4, 1])
     with col:
-        st.markdown("<div class='auth-logo'>🤖</div>", unsafe_allow_html=True)
-        st.markdown("<div class='auth-title'>Groq AI Chatbot</div>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-logo'>⬡</div>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-title'>GROQ·AI</div>", unsafe_allow_html=True)
         st.markdown(
-            "<div class='auth-sub'>Streamlit · LangChain · Groq · ☁️ Google Sheets</div>",
+            "<div class='auth-sub'>STREAMLIT · LANGCHAIN · GROQ · GOOGLE SHEETS</div>",
             unsafe_allow_html=True,
         )
-        tab_si, tab_su, tab_fp = st.tabs(["🔑  Sign In", "📝  Sign Up", "🔓  Forgot Password"])
+        tab_si, tab_su, tab_fp = st.tabs(["  Sign In  ", "  Sign Up  ", "  Forgot Password  "])
         with tab_si: _signin_panel()
         with tab_su: _signup_panel()
         with tab_fp: _forgot_password_panel()
@@ -1283,7 +1232,7 @@ def login_page():
 # ══════════════════════════════════════════════════════════════════════════════
 
 def chat_app():
-    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+    st.markdown(NEON_CSS, unsafe_allow_html=True)
     username = st.session_state.username
 
     sessions = load_sessions(username)
@@ -1302,24 +1251,25 @@ def chat_app():
 
     # ── SIDEBAR ───────────────────────────────────────────────────────────────
     with st.sidebar:
+        # User badge
         st.markdown(
-            f"<div style='padding:.5rem 0;color:#00d4ff;text-shadow:0 0 8px #00d4ff66;"
-            f"font-size:1rem;letter-spacing:.08em;font-style:italic'>"
-            f"👤 &nbsp;<b>{username}</b></div>",
+            f"<div class='sidebar-username'>⬡ &nbsp;{username.upper()}</div>",
             unsafe_allow_html=True,
         )
-        if st.button("🚪 Logout", use_container_width=True):
+        if st.button("Logout", use_container_width=True):
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             st.rerun()
 
         st.divider()
-        st.header("⚙️ Settings")
+
+        # ── API & Model ──
+        st.markdown("<div class='sidebar-section'>Configuration</div>", unsafe_allow_html=True)
 
         groq_key = st.text_input(
             "Groq API Key",
             type="password",
-            placeholder="Enter Your GROQ API Key",
+            placeholder="gsk_…",
         ).strip() or st.secrets.get("GROQ_API_KEY", "")
 
         model = st.selectbox("Model", [
@@ -1332,13 +1282,12 @@ def chat_app():
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
 
+        # ── Tone & Prompt ──
+        st.markdown("<div class='sidebar-section'>Personality</div>", unsafe_allow_html=True)
+
         _tone_options = ["Custom", "Friendly", "Strict", "Teacher"]
-        tone_preset   = st.selectbox(
-            "Tone Preset",
-            _tone_options,
-            index=st.session_state._tone_idx,
-        )
-        new_tone_idx = _tone_options.index(tone_preset)
+        tone_preset   = st.selectbox("Tone Preset", _tone_options, index=st.session_state._tone_idx)
+        new_tone_idx  = _tone_options.index(tone_preset)
         if new_tone_idx != st.session_state._tone_idx:
             st.session_state._tone_idx = new_tone_idx
             if tone_preset != "Custom":
@@ -1347,16 +1296,18 @@ def chat_app():
         new_prompt = st.text_area(
             "System Prompt",
             value=st.session_state.sys_prompt_value,
-            height=110,
+            height=100,
         )
         st.session_state.sys_prompt_value = new_prompt
 
-        if st.button("↺ Reset Prompt"):
-            st.session_state.sys_prompt_value = DEFAULT_PROMPT
-            st.session_state._tone_idx        = 0
-            st.rerun()
-
-        typing = st.checkbox("Enable typing effect", value=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("↺ Reset", use_container_width=True):
+                st.session_state.sys_prompt_value = DEFAULT_PROMPT
+                st.session_state._tone_idx        = 0
+                st.rerun()
+        with c2:
+            typing = st.checkbox("Typing FX", value=True)
 
         settings = dict(
             model=model, temperature=temperature,
@@ -1365,8 +1316,9 @@ def chat_app():
             typing=typing,
         )
 
+        # ── Sessions ──
         st.divider()
-        st.header("💬 Sessions")
+        st.markdown("<div class='sidebar-section'>Sessions</div>", unsafe_allow_html=True)
 
         c_name, c_btn = st.columns([3, 1])
         with c_name:
@@ -1375,24 +1327,23 @@ def chat_app():
                 label_visibility="collapsed", key="new_sess_input",
             )
         with c_btn:
-            if st.button("➕", use_container_width=True, help="New session"):
+            if st.button("＋", use_container_width=True, help="New session"):
                 ns = create_session(username, new_name.strip() or None)
                 st.session_state.active_sid = ns["session_id"]
                 st.rerun()
 
-        st.markdown("")
         for sess in load_sessions(username):
             sid       = sess["session_id"]
             is_active = sid == st.session_state.active_sid
             c1, c2    = st.columns([5, 1])
             with c1:
-                label = ("▶ " if is_active else "   ") + sess["name"]
+                label = ("▸ " if is_active else "  ") + sess["name"]
                 if st.button(label, key=f"sel_{sid}", use_container_width=True):
                     st.session_state.active_sid = sid
                     st.rerun()
             with c2:
-                if st.button("🗑", key=f"del_{sid}", help="Delete session"):
-                    with st.spinner("Deleting …"):
+                if st.button("✕", key=f"del_{sid}", help="Delete"):
+                    with st.spinner("Removing …"):
                         delete_session(username, sid)
                     remaining = load_sessions(username)
                     if remaining:
@@ -1404,7 +1355,7 @@ def chat_app():
                     st.rerun()
 
         st.divider()
-        if st.button("🧹 Clear Active Chat", use_container_width=True):
+        if st.button("⌫  Clear Active Chat", use_container_width=True):
             sid = st.session_state.active_sid
             with st.spinner("Clearing …"):
                 clear_session_messages(username, sid)
@@ -1412,24 +1363,27 @@ def chat_app():
             st.rerun()
 
     # ── MAIN AREA ─────────────────────────────────────────────────────────────
-    st.title("🤖 Groq AI Chatbot")
-    st.caption(
-        f"Streamlit · LangChain · Groq · ☁️ Google Sheets  |  👤 **{username}**"
+    # Page header
+    st.markdown(
+        "<div class='page-title'>⬡ GROQ·AI CHATBOT</div>"
+        "<div class='page-subtitle'>STREAMLIT · LANGCHAIN · GROQ · GOOGLE SHEETS</div>",
+        unsafe_allow_html=True,
     )
+    st.markdown("")
 
     if not groq_key:
-        st.error("🔑 Groq API Key missing. Add GROQ_API_KEY to Streamlit Secrets.")
+        st.error("Groq API Key missing — add GROQ_API_KEY to Streamlit Secrets.")
         st.stop()
 
     sessions   = load_sessions(username)
     active_sid = st.session_state.active_sid
 
     if not sessions:
-        st.info("No sessions yet — click ➕ in the sidebar.")
+        st.info("No sessions yet — click ＋ in the sidebar.")
         return
 
     tab_labels = [
-        ("▶ " if s["session_id"] == active_sid else "") + s["name"]
+        ("▸ " if s["session_id"] == active_sid else "") + s["name"]
         for s in sessions
     ]
     tabs = st.tabs(tab_labels)
@@ -1441,17 +1395,14 @@ def chat_app():
             msgs      = load_msgs(username, sid)
 
             if not is_active:
-                if st.button(f"▶ Switch to **{sess['name']}**", key=f"sw_{sid}"):
+                if st.button(f"▸ Switch to  {sess['name']}", key=f"sw_{sid}"):
                     st.session_state.active_sid = sid
                     st.rerun()
 
             with st.container(height=460, border=True):
                 if not msgs:
                     st.markdown(
-                        "<div style='text-align:center;color:#00d4ff88;"
-                        "padding-top:90px;font-size:1.1rem;font-style:italic;"
-                        "text-shadow:0 0 12px #00d4ff44;letter-spacing:.06em'>"
-                        "💬 No messages yet — say hello below!</div>",
+                        "<div class='empty-chat'>[ NO MESSAGES ] — say hello below</div>",
                         unsafe_allow_html=True,
                     )
                 else:
@@ -1460,32 +1411,29 @@ def chat_app():
                         with st.chat_message(role):
                             st.write(m["content"])
                             if m.get("ts"):
-                                st.caption(f"🕐 {str(m['ts'])[:19].replace('T', '  ')}")
+                                st.caption(str(m["ts"])[:19].replace("T", "  "))
 
             if is_active:
-                c_inp, c_btn = st.columns([7, 1])
+                c_inp, c_btn = st.columns([8, 1])
                 with c_inp:
                     user_input = st.text_input(
                         "", key=f"inp_{sid}",
-                        placeholder="Type your message and press Send …",
+                        placeholder="Type your message …",
                         label_visibility="collapsed",
                     )
                 with c_btn:
-                    send = st.button("Send ➤", key=f"snd_{sid}",
-                                     type="primary", use_container_width=True)
+                    send = st.button("⟶", key=f"snd_{sid}", type="primary", use_container_width=True)
 
                 if send and user_input.strip():
                     ui = user_input.strip()
-                    with st.spinner("💾 Saving …"):
+                    with st.spinner("Saving …"):
                         add_msg(username, sid, "user", ui)
                     try:
-                        with st.spinner("🤔 Thinking …"):
-                            response = generate_response(
-                                username, sid, ui, groq_key, settings
-                            )
+                        with st.spinner("Thinking …"):
+                            response = generate_response(username, sid, ui, groq_key, settings)
                     except Exception as e:
-                        response = f"❌ Model error: {e}"
-                    with st.spinner("💾 Saving …"):
+                        response = f"Model error: {e}"
+                    with st.spinner("Saving …"):
                         add_msg(username, sid, "assistant", response)
 
                     if settings["typing"] and response:
@@ -1499,7 +1447,7 @@ def chat_app():
                     st.rerun()
 
                 if msgs:
-                    with st.expander("⬇️ Export Chat History"):
+                    with st.expander("⬇  Export Chat History"):
                         export_json = json.dumps(
                             [{"role": m["role"], "content": m["content"],
                               "time": str(m.get("ts", ""))} for m in msgs],
@@ -1512,14 +1460,14 @@ def chat_app():
                         ec1, ec2 = st.columns(2)
                         with ec1:
                             st.download_button(
-                                "📥 Download JSON", data=export_json,
+                                "⬇ JSON", data=export_json,
                                 file_name=f"{sess['name']}.json",
                                 mime="application/json",
                                 key=f"dj_{sid}", use_container_width=True,
                             )
                         with ec2:
                             st.download_button(
-                                "📥 Download TXT", data=export_txt,
+                                "⬇ TXT", data=export_txt,
                                 file_name=f"{sess['name']}.txt",
                                 mime="text/plain",
                                 key=f"dt_{sid}", use_container_width=True,
