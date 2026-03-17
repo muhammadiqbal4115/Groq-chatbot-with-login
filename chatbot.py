@@ -1502,7 +1502,7 @@ def chat_app():
                     st.rerun()
 
                 if msgs:
-                    with st.expander("⬇️ Export Chat History"):
+                    with st.expander("Export Chat History"):
                         export_json = json.dumps(
                             [{"role": m["role"], "content": m["content"],
                               "time": str(m.get("ts", ""))} for m in msgs],
