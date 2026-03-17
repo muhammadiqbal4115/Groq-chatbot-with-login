@@ -63,12 +63,12 @@ header,
 /* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
 [data-testid="StyledFullScreenButton"] { display: none !important; }
 
-/* ─── SIDEBAR COLLAPSE ARROW — neon styled ──────────────────────────────── */
+/* ─── SIDEBAR COLLAPSE ARROW — let Streamlit position it, just style it ─── */
 [data-testid="collapsedControl"] {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
-  z-index: 99999 !important;
+  z-index: 9 !important;
   background: #03111d !important;
   border: 1px solid #00d4ff66 !important;
   border-left: none !important;
@@ -76,12 +76,12 @@ header,
   box-shadow: 3px 0 16px #00d4ff44 !important;
   padding: 10px 6px !important;
   cursor: pointer !important;
+  /* NO position:fixed — let Streamlit handle placement */
 }
 [data-testid="collapsedControl"]:hover {
   background: #041e30 !important;
   box-shadow: 3px 0 28px #00d4ff77 !important;
 }
-/* The arrow SVG icon inside the button */
 [data-testid="collapsedControl"] svg {
   fill:   #00d4ff !important;
   color:  #00d4ff !important;
@@ -94,6 +94,35 @@ header,
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
+}
+
+/* ─── EXPANDER — arrow chevron must stay visible ─────────────────────────── */
+[data-testid="stExpander"] summary svg,
+[data-testid="stExpander"] summary [data-testid="stExpanderToggleIcon"],
+[data-testid="stExpander"] details > summary > span > svg,
+[data-testid="stExpander"] details summary svg {
+  display:    inline-block !important;
+  visibility: visible !important;
+  fill:        #00d4ff !important;
+  color:       #00d4ff !important;
+  filter:      drop-shadow(0 0 4px #00d4ff88) !important;
+  width:  16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+[data-testid="stExpander"] details > summary {
+  display:     flex !important;
+  align-items: center !important;
+  gap:         8px !important;
+  padding:     10px 14px !important;
+  cursor:      pointer !important;
+  color:       #00d4ff !important;
+  font-size:   .92rem !important;
+  letter-spacing: .04em;
+  list-style:  none !important;
+}
+[data-testid="stExpander"] details > summary::-webkit-details-marker {
+  display: none !important;
 }
 
 /* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
@@ -381,11 +410,15 @@ small, caption { color: var(--text-muted) !important; font-style: italic; }
   box-shadow: 0 -2px 12px #00d4ff22 !important;
 }
 
-/* ─── EXPANDER ──────────────────────────────────────────────────────────── */
+/* ─── EXPANDER CONTAINER ─────────────────────────────────────────────────── */
 [data-testid="stExpander"] {
   border: 1px solid var(--border) !important;
   border-radius: 8px !important;
   background: var(--bg-card) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+  margin-top: 8px !important;
 }
 [data-testid="stExpander"] summary {
   color: var(--neon-dim) !important;
