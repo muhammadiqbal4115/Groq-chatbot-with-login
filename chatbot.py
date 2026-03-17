@@ -46,9 +46,8 @@ NEON_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap');
 
-#tabs-bui47-tabpanel-0 {
-    width: 50%;
-    margin: 0 auto;
+[data-testid="stMain"] {
+  transition: margin-left 0.3s ease !important;
 }
 
 :root {
@@ -255,7 +254,7 @@ LOGIN_EXTRA_CSS = """
 CHAT_EXTRA_CSS = """
 <style>
   [data-testid="block-container"] {
-    max-width: 1000px !important;
+    max-width: 1100px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     padding-top: 1.5rem !important;
@@ -268,76 +267,96 @@ CHAT_EXTRA_CSS = """
 # Sidebar toggle: runs inside components.html iframe, reaches parent DOM via window.parent
 SIDEBAR_TOGGLE_HTML = """
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:transparent; overflow:hidden; }
   #btn {
-    position:fixed; top:14px; left:14px; z-index:99999;
-    width:40px; height:40px;
+    position:fixed;
+    top:14px;
+    left:14px;
+    z-index:99999;
+    width:42px;
+    height:42px;
     background:#0c1420;
-    border:1px solid rgba(0,212,255,0.55);
-    border-radius:8px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 8px rgba(0,212,255,0.55), 0 0 22px rgba(0,212,255,0.25);
-    transition:background 0.2s, box-shadow 0.2s;
+    border:1px solid rgba(0,212,255,0.6);
+    border-radius:10px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 0 10px rgba(0,212,255,0.6);
+    transition:all 0.25s ease;
   }
+
   #btn:hover {
     background:rgba(0,212,255,0.12);
-    box-shadow:0 0 14px rgba(0,212,255,0.8), 0 0 36px rgba(0,212,255,0.4);
+    box-shadow:0 0 18px rgba(0,212,255,0.9);
   }
-  .hbg { display:flex; flex-direction:column; gap:5px; width:18px; pointer-events:none; }
+
+  .hbg {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    width:18px;
+  }
+
   .hbg span {
-    display:block; height:2px; background:#00d4ff; border-radius:2px;
-    box-shadow:0 0 6px #00d4ff;
-    transition:transform 0.3s ease, opacity 0.3s ease;
+    height:2px;
+    background:#00d4ff;
+    border-radius:2px;
   }
 </style>
 
-<button id="btn" title="Toggle Sidebar">
+<button id="btn">
   <div class="hbg">
-    <span id="l1"></span>
-    <span id="l2"></span>
-    <span id="l3"></span>
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 </button>
 
 <script>
 (function () {
-  var par  = window.parent;
-  var pdoc = par.document;
-  var open = par.sessionStorage.getItem('sb') !== '0';
+  const par = window.parent;
+  const doc = par.document;
 
-  function sidebar() { return pdoc.querySelector('[data-testid="stSidebar"]'); }
+  function sidebar() {
+    return doc.querySelector('[data-testid="stSidebar"]');
+  }
 
-  function applyState() {
-    var sb = sidebar();
-    if (!sb) return;
-    var l1 = document.getElementById('l1');
-    var l2 = document.getElementById('l2');
-    var l3 = document.getElementById('l3');
+  function main() {
+    return doc.querySelector('[data-testid="stMain"]');
+  }
+
+  let open = par.sessionStorage.getItem('sb') !== '0';
+
+  function apply() {
+    const sb = sidebar();
+    const mainEl = main();
+
+    if (!sb || !mainEl) return;
+
     if (open) {
       sb.style.transform = 'translateX(0)';
-      l1.style.transform = 'none';   l1.style.opacity = '1';
-      l2.style.transform = 'none';   l2.style.opacity = '1';
-      l3.style.transform = 'none';   l3.style.opacity = '1';
+      mainEl.style.marginLeft = sb.offsetWidth + 'px';
     } else {
-      sb.style.transform = 'translateX(-110%)';
-      l1.style.transform = 'translateY(7px) rotate(45deg)';
-      l2.style.opacity   = '0';
-      l3.style.transform = 'translateY(-7px) rotate(-45deg)';
+      sb.style.transform = 'translateX(-100%)';
+      mainEl.style.marginLeft = '0px';
     }
+
+    mainEl.style.transition = 'margin-left 0.3s ease';
+
     par.sessionStorage.setItem('sb', open ? '1' : '0');
   }
 
-  function waitAndApply() {
-    if (sidebar()) { applyState(); }
-    else           { setTimeout(waitAndApply, 80); }
+  function init() {
+    if (sidebar()) apply();
+    else setTimeout(init, 100);
   }
-  waitAndApply();
 
-  document.getElementById('btn').addEventListener('click', function () {
+  init();
+
+  document.getElementById('btn').onclick = () => {
     open = !open;
-    applyState();
-  });
+    apply();
+  };
 })();
 </script>
 """
