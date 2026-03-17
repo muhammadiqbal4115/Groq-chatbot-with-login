@@ -23,7 +23,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 st.set_page_config(
     page_title="Groq AI Chatbot",
     page_icon="🤖",
-    layout="centered",
+    layout="wide",
 )
 
 SCOPES = [
