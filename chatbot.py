@@ -44,7 +44,7 @@ TONE_MAP = {
 
 GLOBAL_CSS = """
 <style>
-/* ─── HIDE ALL STREAMLIT CHROME ─────────────────────────────────────────── */
+/* ─── HIDE ALL STREAMLIT CHROME (keep sidebar arrow) ────────────────────── */
 #MainMenu,
 footer,
 header,
@@ -52,17 +52,42 @@ header,
 [data-testid="stToolbar"],
 [data-testid="stDecoration"],
 [data-testid="stStatusWidget"],
-[data-testid="collapsedControl"],
 [data-testid="stDeployButton"],
 .stDeployButton,
 [title="View fullscreen"],
 [title="Download"],
 button[kind="header"],
-[data-testid="stAppViewBlockContainer"] > div:first-child > div:first-child
-  > div:first-child > div:first-child:not([class*="main"]),
 .viewerBadge_container__r5tak,
 .viewerBadge_link__qRIco,
 #stDecoration                            { display: none !important; }
+
+/* ─── SIDEBAR COLLAPSE ARROW — neon styled, always on top ───────────────── */
+[data-testid="collapsedControl"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 99999 !important;
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: 0 8px 8px 0 !important;
+  box-shadow: 3px 0 16px #00d4ff33 !important;
+  padding: 8px 5px !important;
+  cursor: pointer !important;
+  transition: box-shadow .25s, background .25s !important;
+}
+[data-testid="collapsedControl"]:hover {
+  background: #041e30 !important;
+  box-shadow: 3px 0 24px #00d4ff66 !important;
+}
+[data-testid="collapsedControl"] svg,
+[data-testid="collapsedControl"] span {
+  color: var(--neon) !important;
+  fill:  var(--neon) !important;
+  filter: drop-shadow(0 0 4px #00d4ff) !important;
+}
 
 /* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
 :root {
@@ -421,8 +446,42 @@ section.main { background: var(--bg-deep) !important; }
 /* ─── PASSWORD STRENGTH BAR FIX ─────────────────────────────────────────── */
 .strength-bar-bg   { background:#041825 !important; border:1px solid var(--border) !important; }
 
-/* ─── COLUMN GAPS ────────────────────────────────────────────────────────── */
-[data-testid="column"] { gap: .5rem; }
+/* ─── COLUMN / BUTTON LAYOUT — no overlap ───────────────────────────────── */
+[data-testid="column"] {
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+[data-testid="stButton"],
+[data-testid="stDownloadButton"] {
+  position: relative !important;
+  z-index: 1 !important;
+  display: block !important;
+  width: 100% !important;
+}
+[data-testid="stButton"] button,
+[data-testid="stDownloadButton"] button {
+  position: relative !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+/* Sidebar session rows: delete icon won't overlap session name */
+[data-testid="stSidebar"] [data-testid="column"] {
+  padding: 0 2px !important;
+  align-items: center !important;
+}
+/* Send button column stays compact */
+[data-testid="stHorizontalBlock"] [data-testid="column"]:last-child {
+  flex: 0 0 auto !important;
+  min-width: 82px !important;
+}
+/* Row containers */
+[data-testid="stHorizontalBlock"] {
+  gap: 6px !important;
+  align-items: flex-end !important;
+  flex-wrap: nowrap !important;
+}
 </style>
 """
 
