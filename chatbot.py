@@ -254,7 +254,7 @@ LOGIN_EXTRA_CSS = """
 CHAT_EXTRA_CSS = """
 <style>
   [data-testid="block-container"] {
-    max-width: 1100px !important;
+    max-width: 500px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     padding-top: 1.5rem !important;
