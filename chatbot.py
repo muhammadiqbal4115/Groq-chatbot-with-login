@@ -63,16 +63,50 @@ header,
 /* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
 [data-testid="StyledFullScreenButton"] { display: none !important; }
 
-/* ─── HIDE MATERIAL ICON TEXT FALLBACK (but NOT the sidebar arrow) ──────── */
-span[data-testid="stIconMaterial"]:not([data-testid="collapsedControl"] span),
-.exvv1vr0:not([data-testid="collapsedControl"] .exvv1vr0) {
+/* ─── HIDE MATERIAL ICON TEXT FALLBACK (exclude sidebar arrow icons) ─────── */
+span[data-testid="stIconMaterial"]:not(
+  [data-testid="collapsedControl"] span,
+  [data-testid="stSidebarCollapseButton"] span
+) {
   display: none !important;
   visibility: hidden !important;
   font-size: 0 !important;
   width: 0 !important;
   overflow: hidden !important;
 }
-/* Ensure the icon INSIDE collapsedControl is always visible */
+
+/* ─── SIDEBAR COLLAPSE BUTTON (open → close arrow) ─────────────────────── */
+[data-testid="stSidebarCollapseButton"] {
+  display:    flex !important;
+  visibility: visible !important;
+  opacity:    1 !important;
+}
+[data-testid="stSidebarCollapseButton"] button {
+  background:    transparent !important;
+  border:        1px solid #00d4ff66 !important;
+  border-radius: 6px !important;
+  box-shadow:    0 0 10px #00d4ff33 !important;
+  padding:       6px !important;
+  cursor:        pointer !important;
+  transition:    box-shadow .25s, background .25s !important;
+}
+[data-testid="stSidebarCollapseButton"] button:hover {
+  background: #041e30 !important;
+  box-shadow: 0 0 18px #00d4ff66 !important;
+}
+[data-testid="stSidebarCollapseButton"] [data-testid="stIconMaterial"],
+[data-testid="stSidebarCollapseButton"] span[translate="no"] {
+  display:     inline !important;
+  visibility:  visible !important;
+  font-size:   20px !important;
+  width:       auto !important;
+  overflow:    visible !important;
+  color:       #00d4ff !important;
+  font-family: 'Material Icons', 'Material Symbols Outlined', sans-serif !important;
+  filter:      drop-shadow(0 0 5px #00d4ffaa) !important;
+}
+
+/* ─── SIDEBAR EXPAND BUTTON (closed → open arrow) ───────────────────────── */
 [data-testid="collapsedControl"] [data-testid="stIconMaterial"],
 [data-testid="collapsedControl"] span[translate="no"] {
   display:     inline !important;
