@@ -39,6 +39,513 @@ TONE_MAP = {
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+#  GLOBAL NEON LIGHT BLUE CSS — Applied on every render
+# ══════════════════════════════════════════════════════════════════════════════
+
+GLOBAL_CSS = """
+<style>
+/* ─── HIDE ALL STREAMLIT CHROME ─────────────────────────────────────────── */
+#MainMenu,
+footer,
+header,
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+[data-testid="collapsedControl"],
+[data-testid="stDeployButton"],
+.stDeployButton,
+[title="View fullscreen"],
+[title="Download"],
+button[kind="header"],
+[data-testid="stAppViewBlockContainer"] > div:first-child > div:first-child
+  > div:first-child > div:first-child:not([class*="main"]),
+.viewerBadge_container__r5tak,
+.viewerBadge_link__qRIco,
+#stDecoration                            { display: none !important; }
+
+/* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
+:root {
+  --neon:        #00d4ff;
+  --neon-dim:    #0099cc;
+  --neon-bright: #66eeff;
+  --neon-glow:   0 0 8px #00d4ff, 0 0 20px #00d4ff55, 0 0 40px #00d4ff22;
+  --neon-glow-md:0 0 4px #00d4ff, 0 0 12px #00d4ff66;
+  --bg-deep:     #020b14;
+  --bg-panel:    #03111d;
+  --bg-card:     #041825;
+  --bg-input:    #041522;
+  --border:      #00d4ff33;
+  --border-md:   #00d4ff66;
+  --border-hi:   #00d4ffaa;
+  --text-main:   #b8f0ff;
+  --text-muted:  #5ba8c4;
+  --text-dim:    #2d6a82;
+  --ff:          'Times New Roman', Times, serif;
+}
+
+/* ─── GLOBAL FONT & BACKGROUND ─────────────────────────────────────────── */
+*, *::before, *::after {
+  font-family: var(--ff) !important;
+  box-sizing: border-box;
+}
+
+html, body,
+[data-testid="stApp"],
+[data-testid="stAppViewContainer"],
+.main, .block-container {
+  background: var(--bg-deep) !important;
+  color: var(--text-main) !important;
+}
+
+/* Animated grid background */
+[data-testid="stAppViewContainer"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .35;
+  animation: gridPulse 6s ease-in-out infinite;
+}
+@keyframes gridPulse {
+  0%,100% { opacity:.25; }
+  50%      { opacity:.45; }
+}
+
+.block-container {
+  position: relative;
+  z-index: 1;
+  padding-top: 1.5rem !important;
+  max-width: 1200px !important;
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar               { width:6px; height:6px; }
+::-webkit-scrollbar-track         { background:var(--bg-deep); }
+::-webkit-scrollbar-thumb         { background:var(--neon-dim); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover   { background:var(--neon); }
+
+/* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+  background: var(--bg-panel) !important;
+  border-right: 1px solid var(--border-md) !important;
+  box-shadow: 4px 0 30px #00d4ff18 !important;
+}
+[data-testid="stSidebar"] * { color: var(--text-main) !important; }
+[data-testid="stSidebar"] .stMarkdown h3,
+[data-testid="stSidebar"] h3 {
+  color: var(--neon) !important;
+  text-shadow: var(--neon-glow-md);
+  letter-spacing: .08em;
+  font-size: 1rem !important;
+}
+[data-testid="stSidebar"] hr { border-color: var(--border-md) !important; }
+
+/* ─── MAIN TITLE ────────────────────────────────────────────────────────── */
+h1 {
+  color: var(--neon) !important;
+  text-shadow: var(--neon-glow) !important;
+  font-size: 2rem !important;
+  letter-spacing: .12em !important;
+  font-style: italic;
+  animation: titleFlicker 8s ease-in-out infinite;
+}
+@keyframes titleFlicker {
+  0%,96%,100% { opacity:1; text-shadow: var(--neon-glow); }
+  97%         { opacity:.85; text-shadow: 0 0 4px #00d4ff; }
+  98%         { opacity:1; }
+  99%         { opacity:.9; }
+}
+h2, h3, h4 {
+  color: var(--neon) !important;
+  text-shadow: var(--neon-glow-md) !important;
+  letter-spacing: .06em;
+}
+
+/* ─── CAPTION / SMALL TEXT ──────────────────────────────────────────────── */
+.stCaption, [data-testid="stCaptionContainer"],
+small, caption { color: var(--text-muted) !important; font-style: italic; }
+
+/* ─── INPUTS ────────────────────────────────────────────────────────────── */
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: 6px !important;
+  color: var(--neon-bright) !important;
+  caret-color: var(--neon) !important;
+  transition: border .25s, box-shadow .25s;
+  font-size: .95rem !important;
+}
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus {
+  border-color: var(--neon) !important;
+  box-shadow: var(--neon-glow-md) !important;
+  outline: none !important;
+}
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder { color: var(--text-dim) !important; }
+
+/* Label text above inputs */
+[data-testid="stTextInput"] label,
+[data-testid="stTextArea"] label,
+[data-testid="stSelectbox"] label,
+[data-testid="stSlider"] label,
+[data-testid="stCheckbox"] label {
+  color: var(--text-muted) !important;
+  font-size: .85rem !important;
+  letter-spacing: .04em;
+}
+
+/* ─── SELECTBOX ─────────────────────────────────────────────────────────── */
+[data-testid="stSelectbox"] > div > div {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: 6px !important;
+  color: var(--neon-bright) !important;
+}
+[data-testid="stSelectbox"] > div > div:focus-within {
+  border-color: var(--neon) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+/* Dropdown list */
+[data-testid="stSelectbox"] ul,
+[role="listbox"] {
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-md) !important;
+}
+[data-testid="stSelectbox"] li,
+[role="option"] {
+  color: var(--text-main) !important;
+}
+[role="option"]:hover, [role="option"][aria-selected="true"] {
+  background: #00d4ff22 !important;
+  color: var(--neon) !important;
+}
+
+/* ─── SLIDER ────────────────────────────────────────────────────────────── */
+[data-testid="stSlider"] [role="slider"] {
+  background: var(--neon) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+[data-testid="stSlider"] div[data-baseweb="slider"] > div:first-child {
+  background: var(--border-md) !important;
+}
+[data-testid="stSlider"] div[data-baseweb="slider"] > div:nth-child(2) {
+  background: var(--neon) !important;
+}
+[data-testid="stSlider"] p { color: var(--neon-bright) !important; }
+
+/* ─── CHECKBOX ──────────────────────────────────────────────────────────── */
+[data-testid="stCheckbox"] input[type="checkbox"] + div {
+  border-color: var(--neon-dim) !important;
+  background: var(--bg-input) !important;
+}
+[data-testid="stCheckbox"] input[type="checkbox"]:checked + div {
+  background: var(--neon) !important;
+  border-color: var(--neon) !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+/* ─── BUTTONS ───────────────────────────────────────────────────────────── */
+[data-testid="stButton"] button {
+  background: transparent !important;
+  border: 1px solid var(--neon-dim) !important;
+  color: var(--neon) !important;
+  border-radius: 6px !important;
+  font-size: .85rem !important;
+  letter-spacing: .06em !important;
+  transition: all .25s !important;
+  text-shadow: 0 0 6px #00d4ff88;
+}
+[data-testid="stButton"] button:hover {
+  border-color: var(--neon) !important;
+  background: #00d4ff18 !important;
+  box-shadow: var(--neon-glow-md) !important;
+  color: var(--neon-bright) !important;
+  text-shadow: var(--neon-glow) !important;
+}
+/* Primary buttons */
+[data-testid="stButton"] button[kind="primary"] {
+  background: linear-gradient(135deg, #003d54, #005f7a) !important;
+  border: 1px solid var(--neon) !important;
+  box-shadow: var(--neon-glow-md) !important;
+  color: var(--neon-bright) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+}
+[data-testid="stButton"] button[kind="primary"]:hover {
+  background: linear-gradient(135deg, #005f7a, #0099cc) !important;
+  box-shadow: var(--neon-glow) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ─── DOWNLOAD BUTTONS ──────────────────────────────────────────────────── */
+[data-testid="stDownloadButton"] button {
+  background: transparent !important;
+  border: 1px solid var(--neon-dim) !important;
+  color: var(--neon) !important;
+  border-radius: 6px !important;
+  transition: all .25s !important;
+}
+[data-testid="stDownloadButton"] button:hover {
+  background: #00d4ff18 !important;
+  box-shadow: var(--neon-glow-md) !important;
+}
+
+/* ─── TABS ──────────────────────────────────────────────────────────────── */
+[data-testid="stTabs"] [role="tablist"] {
+  border-bottom: 1px solid var(--border-md) !important;
+  gap: 2px;
+}
+[data-testid="stTabs"] button[role="tab"] {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border-radius: 6px 6px 0 0 !important;
+  border: 1px solid transparent !important;
+  border-bottom: none !important;
+  font-size: .88rem !important;
+  letter-spacing: .05em;
+  transition: all .2s;
+}
+[data-testid="stTabs"] button[role="tab"]:hover {
+  color: var(--neon) !important;
+  background: #00d4ff0a !important;
+}
+[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+  color: var(--neon) !important;
+  background: var(--bg-card) !important;
+  border-color: var(--border-md) !important;
+  border-bottom-color: var(--bg-card) !important;
+  text-shadow: var(--neon-glow-md) !important;
+  box-shadow: 0 -2px 12px #00d4ff22 !important;
+}
+
+/* ─── EXPANDER ──────────────────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--bg-card) !important;
+}
+[data-testid="stExpander"] summary {
+  color: var(--neon-dim) !important;
+}
+[data-testid="stExpander"] summary:hover {
+  color: var(--neon) !important;
+}
+
+/* ─── CHAT MESSAGES ─────────────────────────────────────────────────────── */
+[data-testid="stChatMessage"] {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  margin-bottom: .5rem !important;
+  animation: msgAppear .3s ease;
+}
+@keyframes msgAppear {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+/* User messages */
+[data-testid="stChatMessage"][data-testid*="user"],
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+  border-color: var(--neon-dim) !important;
+  background: #04202e !important;
+}
+/* AI messages */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+  border-color: #00d4ff44 !important;
+  background: #03141e !important;
+}
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] .stMarkdown { color: var(--text-main) !important; }
+
+/* ─── STCONTAINER (chat area) ───────────────────────────────────────────── */
+[data-testid="stVerticalBlockBorderWrapper"] {
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 30px #00d4ff08, 0 0 20px #00d4ff11 !important;
+}
+
+/* ─── SPINNER ───────────────────────────────────────────────────────────── */
+[data-testid="stSpinner"] p { color: var(--neon-dim) !important; font-style: italic; }
+[data-testid="stSpinner"] svg circle { stroke: var(--neon) !important; }
+
+/* ─── ALERT / INFO / SUCCESS / ERROR ────────────────────────────────────── */
+[data-testid="stAlert"] {
+  background: var(--bg-card) !important;
+  border-radius: 8px !important;
+}
+[data-testid="stAlert"][data-baseweb="notification"][kind="info"],
+.stInfo {
+  border: 1px solid #00d4ff55 !important;
+  background: #011f2e !important;
+  color: var(--neon) !important;
+}
+[data-testid="stAlert"][kind="success"], .stSuccess {
+  border: 1px solid #00ff9955 !important;
+  background: #011e11 !important;
+  color: #66ffbb !important;
+}
+[data-testid="stAlert"][kind="error"], .stError {
+  border: 1px solid #ff335566 !important;
+  background: #1e0305 !important;
+  color: #ff8899 !important;
+}
+[data-testid="stAlert"] p { color: inherit !important; }
+
+/* ─── DIVIDER ───────────────────────────────────────────────────────────── */
+hr { border-color: var(--border-md) !important; }
+
+/* ─── CODE BLOCKS ───────────────────────────────────────────────────────── */
+code, pre {
+  background: #041018 !important;
+  color: var(--neon-bright) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+/* ─── STMARKDOWN general ────────────────────────────────────────────────── */
+.stMarkdown p, .stMarkdown li, .stMarkdown span { color: var(--text-main) !important; }
+.stMarkdown a { color: var(--neon) !important; text-decoration: underline; }
+
+/* ─── SECTION CONTAINER ─────────────────────────────────────────────────── */
+section.main { background: var(--bg-deep) !important; }
+
+/* ─── PASSWORD STRENGTH BAR FIX ─────────────────────────────────────────── */
+.strength-bar-bg   { background:#041825 !important; border:1px solid var(--border) !important; }
+
+/* ─── COLUMN GAPS ────────────────────────────────────────────────────────── */
+[data-testid="column"] { gap: .5rem; }
+</style>
+"""
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  AUTH PAGE CSS — extended for neon theme
+# ══════════════════════════════════════════════════════════════════════════════
+
+_AUTH_CSS = """
+<style>
+  section[data-testid="stSidebar"] { display:none !important; }
+
+  .auth-logo {
+    text-align:center;
+    font-size:3.8rem;
+    margin-bottom:.4rem;
+    animation: logoPulse 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px #00d4ff);
+  }
+  @keyframes logoPulse {
+    0%,100% { filter: drop-shadow(0 0 12px #00d4ff); }
+    50%      { filter: drop-shadow(0 0 24px #00d4ff) drop-shadow(0 0 40px #00d4ff66); }
+  }
+
+  .auth-title {
+    text-align:center;
+    font-size:2rem;
+    font-weight:700;
+    font-style:italic;
+    color:#00d4ff;
+    text-shadow: 0 0 8px #00d4ff, 0 0 20px #00d4ff55, 0 0 40px #00d4ff22;
+    margin-bottom:.25rem;
+    letter-spacing:.12em;
+    animation: titleFlicker 8s ease-in-out infinite;
+  }
+  @keyframes titleFlicker {
+    0%,96%,100% { opacity:1; }
+    97%         { opacity:.8; }
+    99%         { opacity:.93; }
+  }
+
+  .auth-sub {
+    text-align:center;
+    color:#5ba8c4;
+    font-size:.9rem;
+    font-style:italic;
+    margin-bottom:1.4rem;
+    letter-spacing:.06em;
+  }
+
+  .strength-bar-bg   {
+    background:#041825;
+    border:1px solid #00d4ff33;
+    border-radius:6px;
+    height:7px;
+    width:100%;
+    margin:5px 0 3px;
+    overflow:hidden;
+  }
+  .strength-bar-fill {
+    height:7px;
+    border-radius:6px;
+    box-shadow: 0 0 8px currentColor;
+    transition: width .4s ease, background .4s ease;
+  }
+
+  .hint-pill {
+    display:inline-block;
+    background:#03111d;
+    border:1px solid #00d4ff33;
+    border-radius:20px;
+    padding:3px 11px;
+    font-size:.78rem;
+    color:#5ba8c4;
+    margin:3px 3px;
+    letter-spacing:.04em;
+    transition: all .2s;
+  }
+  .hint-ok {
+    border-color:#00ff99;
+    color:#00ff99;
+    background:#011e11;
+    box-shadow: 0 0 6px #00ff9944;
+  }
+
+  .info-box {
+    background:#011f2e;
+    border:1px solid #00d4ff44;
+    border-radius:8px;
+    padding:.65rem 1rem;
+    font-size:.83rem;
+    color:#66ccee;
+    margin-top:.9rem;
+    text-align:center;
+    box-shadow: 0 0 12px #00d4ff11;
+  }
+
+  .warn-box {
+    background:#1a0505;
+    border:1px solid #ff335544;
+    border-radius:8px;
+    padding:.65rem 1rem;
+    font-size:.83rem;
+    color:#ff8899;
+    margin-top:.9rem;
+    text-align:center;
+  }
+
+  .otp-box {
+    background:#01200e;
+    border:1px solid #00ff9966;
+    border-radius:8px;
+    padding:.75rem 1rem;
+    font-size:.86rem;
+    color:#66ffbb;
+    margin:.7rem 0;
+    text-align:center;
+    box-shadow: 0 0 12px #00ff9911;
+  }
+</style>
+"""
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 #  GOOGLE SHEETS CONNECTION
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -86,7 +593,6 @@ def _hp(password: str) -> str:
 
 @st.cache_data(ttl=30, show_spinner=False)
 def _cached_users() -> dict:
-    """username → {password_hash, email, full_name}"""
     result = {}
     for r in all_rows("users"):
         result[r["username"]] = {
@@ -406,41 +912,8 @@ def password_strength(password: str):
     if re.search(r"[A-Z]", password):        score += 1
     if re.search(r"[^A-Za-z0-9]", password): score += 1
     labels = {0: "Very Weak", 1: "Weak", 2: "Fair", 3: "Strong", 4: "Very Strong"}
-    colors = {0: "#e74c3c", 1: "#e67e22", 2: "#f1c40f", 3: "#2ecc71", 4: "#27ae60"}
+    colors = {0: "#ff3355", 1: "#ff8c00", 2: "#ffd700", 3: "#00d4ff", 4: "#00ff99"}
     return score, labels[score], colors[score]
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  AUTH PAGE CSS
-# ══════════════════════════════════════════════════════════════════════════════
-
-_AUTH_CSS = """
-<style>
-  section[data-testid="stSidebar"] { display:none !important; }
-  .auth-logo  { text-align:center; font-size:3.2rem; margin-bottom:.3rem; }
-  .auth-title { text-align:center; font-size:1.7rem; font-weight:700;
-                color:#e2e2f0; margin-bottom:.2rem; }
-  .auth-sub   { text-align:center; color:#888; font-size:.88rem;
-                margin-bottom:1.2rem; }
-  .strength-bar-bg   { background:#2d2d4e; border-radius:6px;
-                        height:6px; width:100%; margin:4px 0 2px; }
-  .strength-bar-fill { height:6px; border-radius:6px;
-                        transition:width .4s, background .4s; }
-  .hint-pill { display:inline-block; background:#23234a;
-               border:1px solid #3a3a6a; border-radius:20px;
-               padding:2px 10px; font-size:.78rem; color:#aaa; margin:2px 3px; }
-  .hint-ok   { border-color:#2ecc71; color:#2ecc71; background:#0d2e1a; }
-  .info-box  { background:#1e3a5f; border:1px solid #2255a4; border-radius:8px;
-               padding:.6rem 1rem; font-size:.82rem; color:#9ec5fe;
-               margin-top:.8rem; text-align:center; }
-  .warn-box  { background:#2e1e1e; border:1px solid #a44; border-radius:8px;
-               padding:.6rem 1rem; font-size:.82rem; color:#ffaaaa;
-               margin-top:.8rem; text-align:center; }
-  .otp-box   { background:#1a2e1a; border:1px solid #2ecc71; border-radius:8px;
-               padding:.7rem 1rem; font-size:.85rem; color:#aaffaa;
-               margin:.6rem 0; text-align:center; }
-</style>
-"""
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -460,8 +933,6 @@ def _signin_panel():
 
         if not u or not pw:
             st.error("⚠️  Please fill in both fields.")
-
-        # ── CHECK 1: username does not exist at all ───────────────────────────
         elif not user_exists(u):
             st.error("❌  User not found. Please sign up first.")
             st.markdown(
@@ -471,8 +942,6 @@ def _signin_panel():
                 "</div>",
                 unsafe_allow_html=True,
             )
-
-        # ── CHECK 2: username exists but password is wrong ────────────────────
         elif not auth_user(u, pw):
             st.error("🔑  Incorrect password. Please try again.")
             st.markdown(
@@ -481,8 +950,6 @@ def _signin_panel():
                 "</div>",
                 unsafe_allow_html=True,
             )
-
-        # ── SUCCESS ───────────────────────────────────────────────────────────
         else:
             st.session_state.logged_in = True
             st.session_state.username  = u
@@ -491,7 +958,8 @@ def _signin_panel():
             st.rerun()
 
     st.markdown(
-        "<div class='info-box'>No account yet? Switch to the <b>Sign Up</b> or Switch to <b>Forget Password</b> if forget your password</div>",
+        "<div class='info-box'>No account yet? Switch to <b>Sign Up</b> · "
+        "Forgot password? Use <b>Forgot Password</b></div>",
         unsafe_allow_html=True,
     )
 
@@ -505,37 +973,34 @@ def _signup_panel():
     full_name = st.text_input("🙂  Full Name", key="su_name",
                               placeholder="Enter Your Full Name")
 
-    # ── Username ──────────────────────────────────────────────────────────────
     su_un = st.text_input("👤  Username", key="su_un",
                           placeholder="3–32 chars · letters / numbers / _ . -")
     if su_un:
         err = validate_username(su_un)
         if err:
-            st.markdown(f"<span style='color:#e74c3c;font-size:.82rem'>⚠ {err}</span>",
+            st.markdown(f"<span style='color:#ff3355;font-size:.82rem'>⚠ {err}</span>",
                         unsafe_allow_html=True)
         elif user_exists(su_un.strip()):
-            st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
                         "⚠ Username already taken.</span>", unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
+            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>"
                         "✔ Username available!</span>", unsafe_allow_html=True)
 
-    # ── Email ─────────────────────────────────────────────────────────────────
     su_email = st.text_input("📧  Email", key="su_email",
                              placeholder="you@example.com")
     if su_email:
         e_err = validate_email(su_email)
         if e_err:
-            st.markdown(f"<span style='color:#e74c3c;font-size:.82rem'>⚠ {e_err}</span>",
+            st.markdown(f"<span style='color:#ff3355;font-size:.82rem'>⚠ {e_err}</span>",
                         unsafe_allow_html=True)
         elif email_exists(su_email.strip()):
-            st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
                         "⚠ Email already registered.</span>", unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#2ecc71;font-size:.82rem'>"
+            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>"
                         "✔ Email available!</span>", unsafe_allow_html=True)
 
-    # ── Password ──────────────────────────────────────────────────────────────
     su_pw1 = st.text_input("🔒  Password", type="password", key="su_pw1",
                            placeholder="min 6 chars, letter + number")
     if su_pw1:
@@ -549,8 +1014,8 @@ def _signup_panel():
             return f"<span class='{cls}'>{'✔' if ok else '·'} {text}</span>"
         st.markdown(
             f"<div class='strength-bar-bg'>"
-            f"<div class='strength-bar-fill' style='width:{pct}%;background:{color}'></div>"
-            f"</div><span style='color:{color};font-size:.78rem'>"
+            f"<div class='strength-bar-fill' style='width:{pct}%;background:{color};box-shadow:0 0 8px {color}'></div>"
+            f"</div><span style='color:{color};font-size:.78rem;text-shadow:0 0 6px {color}88'>"
             f"Strength: <b>{label}</b></span><br>"
             + pill("6+ chars", has_len)
             + pill("Letter",   has_letter)
@@ -562,10 +1027,10 @@ def _signup_panel():
                            placeholder="Re-enter your password")
     if su_pw2 and su_pw1:
         if su_pw1 == su_pw2:
-            st.markdown("<span style='color:#2ecc71;font-size:.82rem'>✔ Passwords match</span>",
+            st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>✔ Passwords match</span>",
                         unsafe_allow_html=True)
         else:
-            st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+            st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
                         "⚠ Passwords do not match</span>", unsafe_allow_html=True)
 
     st.markdown("")
@@ -621,7 +1086,6 @@ def _forgot_password_panel():
         st.session_state.fp_email    = ""
         st.session_state.fp_username = ""
 
-    # ── STEP 1: Enter email ───────────────────────────────────────────────────
     if st.session_state.fp_step == 1:
         st.markdown("#### 📧 Enter your registered email")
         st.caption("We'll send a 6-digit reset code to your inbox.")
@@ -657,7 +1121,6 @@ def _forgot_password_panel():
             unsafe_allow_html=True,
         )
 
-    # ── STEP 2: Enter OTP + new password ─────────────────────────────────────
     elif st.session_state.fp_step == 2:
         email = st.session_state.fp_email
         st.markdown(f"#### 🔐 Reset password for `{email}`")
@@ -677,8 +1140,8 @@ def _forgot_password_panel():
             pct = int((score / 4) * 100)
             st.markdown(
                 f"<div class='strength-bar-bg'>"
-                f"<div class='strength-bar-fill' style='width:{pct}%;background:{color}'></div>"
-                f"</div><span style='color:{color};font-size:.78rem'>"
+                f"<div class='strength-bar-fill' style='width:{pct}%;background:{color};box-shadow:0 0 8px {color}'></div>"
+                f"</div><span style='color:{color};font-size:.78rem;text-shadow:0 0 6px {color}88'>"
                 f"Strength: <b>{label}</b></span>",
                 unsafe_allow_html=True,
             )
@@ -687,10 +1150,10 @@ def _forgot_password_panel():
                                 key="fp_pw2", placeholder="Re-enter new password")
         if new_pw2 and new_pw1:
             if new_pw1 == new_pw2:
-                st.markdown("<span style='color:#2ecc71;font-size:.82rem'>✔ Passwords match</span>",
+                st.markdown("<span style='color:#00ff99;font-size:.82rem;text-shadow:0 0 6px #00ff9966'>✔ Passwords match</span>",
                             unsafe_allow_html=True)
             else:
-                st.markdown("<span style='color:#e74c3c;font-size:.82rem'>"
+                st.markdown("<span style='color:#ff3355;font-size:.82rem'>"
                             "⚠ Passwords do not match</span>", unsafe_allow_html=True)
 
         st.markdown("")
@@ -742,7 +1205,8 @@ def _forgot_password_panel():
 # ══════════════════════════════════════════════════════════════════════════════
 
 def login_page():
-    st.markdown(_AUTH_CSS, unsafe_allow_html=True)
+    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+    st.markdown(_AUTH_CSS,  unsafe_allow_html=True)
     _, col, _ = st.columns([1, 1.5, 1])
     with col:
         st.markdown("<div class='auth-logo'>🤖</div>", unsafe_allow_html=True)
@@ -762,6 +1226,7 @@ def login_page():
 # ══════════════════════════════════════════════════════════════════════════════
 
 def chat_app():
+    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
     username = st.session_state.username
 
     sessions = load_sessions(username)
@@ -773,7 +1238,6 @@ def chat_app():
             not any(s["session_id"] == st.session_state.active_sid for s in sessions)):
         st.session_state.active_sid = sessions[0]["session_id"]
 
-    # Seed prompt + tone index once
     if "sys_prompt_value" not in st.session_state:
         st.session_state.sys_prompt_value = DEFAULT_PROMPT
     if "_tone_idx" not in st.session_state:
@@ -781,7 +1245,12 @@ def chat_app():
 
     # ── SIDEBAR ───────────────────────────────────────────────────────────────
     with st.sidebar:
-        st.markdown(f"### 👤 {username}")
+        st.markdown(
+            f"<div style='padding:.5rem 0;color:#00d4ff;text-shadow:0 0 8px #00d4ff66;"
+            f"font-size:1rem;letter-spacing:.08em;font-style:italic'>"
+            f"👤 &nbsp;<b>{username}</b></div>",
+            unsafe_allow_html=True,
+        )
         if st.button("🚪 Logout", use_container_width=True):
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
@@ -806,7 +1275,6 @@ def chat_app():
         temperature = st.slider("Temperature", 0.0, 1.0, 0.4, 0.1)
         max_tokens  = st.slider("Max Tokens",  64, 2048, 640, 64)
 
-        # Tone preset — controlled via index (no widget key) to allow reset
         _tone_options = ["Custom", "Friendly", "Strict", "Teacher"]
         tone_preset   = st.selectbox(
             "Tone Preset",
@@ -819,7 +1287,6 @@ def chat_app():
             if tone_preset != "Custom":
                 st.session_state.sys_prompt_value = TONE_MAP[tone_preset]
 
-        # System prompt text area
         new_prompt = st.text_area(
             "System Prompt",
             value=st.session_state.sys_prompt_value,
@@ -827,7 +1294,6 @@ def chat_app():
         )
         st.session_state.sys_prompt_value = new_prompt
 
-        # Reset button
         if st.button("↺ Reset Prompt"):
             st.session_state.sys_prompt_value = DEFAULT_PROMPT
             st.session_state._tone_idx        = 0
@@ -925,8 +1391,9 @@ def chat_app():
             with st.container(height=460, border=True):
                 if not msgs:
                     st.markdown(
-                        "<div style='text-align:center;color:#999;"
-                        "padding-top:90px;font-size:1.1rem'>"
+                        "<div style='text-align:center;color:#00d4ff88;"
+                        "padding-top:90px;font-size:1.1rem;font-style:italic;"
+                        "text-shadow:0 0 12px #00d4ff44;letter-spacing:.06em'>"
                         "💬 No messages yet — say hello below!</div>",
                         unsafe_allow_html=True,
                     )
