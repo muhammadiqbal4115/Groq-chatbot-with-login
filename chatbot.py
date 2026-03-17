@@ -251,18 +251,18 @@ LOGIN_EXTRA_CSS = """
 """
 
 # Chat page: center content at a readable max-width
-# CHAT_EXTRA_CSS = """
-# <style>
-#   [data-testid="block-container"] {
-#     max-width: 500px !important;
-#     margin-left: auto !important;
-#     margin-right: auto !important;
-#     padding-top: 1.5rem !important;
-#     padding-left: 1.5rem !important;
-#     padding-right: 1.5rem !important;
-#   }
-# </style>
-# """
+CHAT_EXTRA_CSS = """
+<style>
+  [data-testid="block-container"] {
+    max-width: 500px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-top: 1.5rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+</style>
+"""
 
 # Sidebar toggle: runs inside components.html iframe, reaches parent DOM via window.parent
 SIDEBAR_TOGGLE_HTML = """
@@ -270,7 +270,7 @@ SIDEBAR_TOGGLE_HTML = """
   #btn {
     position:fixed;
     top:14px;
-    left:14px;
+    right:14px;
     z-index:99999;
     width:42px;
     height:42px;
