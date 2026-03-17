@@ -63,16 +63,26 @@ header,
 /* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
 [data-testid="StyledFullScreenButton"] { display: none !important; }
 
-/* ─── HIDE MATERIAL ICON TEXT FALLBACK ──────────────────────────────────── */
-[data-testid="stIconMaterial"],
-span[data-testid="stIconMaterial"],
-.exvv1vr0,
-span[translate="no"][data-testid="stIconMaterial"] {
+/* ─── HIDE MATERIAL ICON TEXT FALLBACK (but NOT the sidebar arrow) ──────── */
+span[data-testid="stIconMaterial"]:not([data-testid="collapsedControl"] span),
+.exvv1vr0:not([data-testid="collapsedControl"] .exvv1vr0) {
   display: none !important;
   visibility: hidden !important;
   font-size: 0 !important;
   width: 0 !important;
   overflow: hidden !important;
+}
+/* Ensure the icon INSIDE collapsedControl is always visible */
+[data-testid="collapsedControl"] [data-testid="stIconMaterial"],
+[data-testid="collapsedControl"] span[translate="no"] {
+  display:     inline !important;
+  visibility:  visible !important;
+  font-size:   20px !important;
+  width:       auto !important;
+  overflow:    visible !important;
+  color:       #00d4ff !important;
+  font-family: 'Material Icons', 'Material Symbols Outlined', sans-serif !important;
+  filter:      drop-shadow(0 0 5px #00d4ffaa) !important;
 }
 
 /* ─── SIDEBAR COLLAPSE ARROW — fixed to left edge, never over main content ─ */
