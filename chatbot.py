@@ -42,6 +42,31 @@ TONE_MAP = {
 #  CSS BLOCKS
 # ══════════════════════════════════════════════════════════════════════════════
 
+st.markdown("""
+<style>
+/* Remove default padding from main block */
+.main .block-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 100%;
+}
+
+/* Fix your specific class */
+.stVerticalBlock.st-emotion-cache-tn0cau {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Optional: adjust sidebar overlap */
+section[data-testid="stSidebar"] {
+    min-width: 250px;
+    max-width: 300px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 NEON_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap');
