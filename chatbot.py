@@ -23,7 +23,6 @@ st.set_page_config(
     page_title="Groq AI Chatbot",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="auto",
 )
 
 SCOPES = [
@@ -45,7 +44,9 @@ TONE_MAP = {
 
 GLOBAL_CSS = """
 <style>
-/* ─── HIDE ALL STREAMLIT CHROME (keep sidebar arrow) ────────────────────── */
+/* ─── HIDE ALL STREAMLIT CHROME ─────────────────────────────────────────── */
+/* NOTE: collapsedControl, title=Download, button[kind=header] intentionally
+   NOT hidden — they are real UI elements we want to keep visible.           */
 #MainMenu,
 footer,
 header,
@@ -55,39 +56,44 @@ header,
 [data-testid="stStatusWidget"],
 [data-testid="stDeployButton"],
 .stDeployButton,
-[title="View fullscreen"],
-[title="Download"],
-button[kind="header"],
 .viewerBadge_container__r5tak,
 .viewerBadge_link__qRIco,
-#stDecoration                            { display: none !important; }
+#stDecoration { display: none !important; }
 
-/* ─── SIDEBAR COLLAPSE ARROW — neon styled, always on top ───────────────── */
+/* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
+[data-testid="StyledFullScreenButton"] { display: none !important; }
+
+/* ─── SIDEBAR COLLAPSE ARROW — neon styled ──────────────────────────────── */
 [data-testid="collapsedControl"] {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
-  position: fixed !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
   z-index: 99999 !important;
-  background: var(--bg-panel) !important;
-  border: 1px solid var(--border-md) !important;
+  background: #03111d !important;
+  border: 1px solid #00d4ff66 !important;
+  border-left: none !important;
   border-radius: 0 8px 8px 0 !important;
-  box-shadow: 3px 0 16px #00d4ff33 !important;
-  padding: 8px 5px !important;
+  box-shadow: 3px 0 16px #00d4ff44 !important;
+  padding: 10px 6px !important;
   cursor: pointer !important;
-  transition: box-shadow .25s, background .25s !important;
 }
 [data-testid="collapsedControl"]:hover {
   background: #041e30 !important;
-  box-shadow: 3px 0 24px #00d4ff66 !important;
+  box-shadow: 3px 0 28px #00d4ff77 !important;
 }
-[data-testid="collapsedControl"] svg,
-[data-testid="collapsedControl"] span {
-  color: var(--neon) !important;
-  fill:  var(--neon) !important;
-  filter: drop-shadow(0 0 4px #00d4ff) !important;
+/* The arrow SVG icon inside the button */
+[data-testid="collapsedControl"] svg {
+  fill:   #00d4ff !important;
+  color:  #00d4ff !important;
+  filter: drop-shadow(0 0 5px #00d4ffaa) !important;
+  width:  18px !important;
+  height: 18px !important;
+}
+[data-testid="collapsedControl"] button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 /* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
@@ -312,16 +318,39 @@ small, caption { color: var(--text-muted) !important; font-style: italic; }
 }
 
 /* ─── DOWNLOAD BUTTONS ──────────────────────────────────────────────────── */
+[data-testid="stDownloadButton"] {
+  position: relative !important;
+  z-index: 1 !important;
+}
 [data-testid="stDownloadButton"] button {
   background: transparent !important;
   border: 1px solid var(--neon-dim) !important;
   color: var(--neon) !important;
   border-radius: 6px !important;
   transition: all .25s !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 [data-testid="stDownloadButton"] button:hover {
   background: #00d4ff18 !important;
   box-shadow: var(--neon-glow-md) !important;
+  border-color: var(--neon) !important;
+}
+/* Fix anchor tag inside download button that causes text doubling */
+[data-testid="stDownloadButton"] button a,
+[data-testid="stDownloadButton"] a {
+  color: var(--neon) !important;
+  text-decoration: none !important;
+  position: static !important;
+  display: contents !important;
 }
 
 /* ─── TABS ──────────────────────────────────────────────────────────────── */
@@ -1502,7 +1531,7 @@ def chat_app():
                     st.rerun()
 
                 if msgs:
-                    with st.expander("Export Chat History"):
+                    with st.expander("⬇️ Export Chat History"):
                         export_json = json.dumps(
                             [{"role": m["role"], "content": m["content"],
                               "time": str(m.get("ts", ""))} for m in msgs],
