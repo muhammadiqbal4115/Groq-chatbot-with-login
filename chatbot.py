@@ -6,7 +6,6 @@ import string
 import hashlib
 import smtplib
 import streamlit as st
-import streamlit.components.v1 as components
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -682,6 +681,56 @@ section[data-testid="stSidebar"].auth-hidden { display:none !important; }
 .sidebar-overlay.visible { display: block; }
 </style>
 
+<script>
+(function() {
+  // Sidebar toggle logic — runs after DOM ready
+  function initToggle() {
+    const sidebar = document.querySelector('[data-testid="stSidebar"]');
+    const btn     = document.getElementById('sidebarToggleBtn');
+    const hbg     = document.getElementById('hbgIcon');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar || !btn) return;
+
+    // Read stored state
+    let open = sessionStorage.getItem('sidebarOpen') !== 'false';
+
+    function apply() {
+      if (open) {
+        sidebar.classList.remove('sidebar-collapsed');
+        hbg.classList.add('open');
+        overlay.classList.remove('visible');
+      } else {
+        sidebar.classList.add('sidebar-collapsed');
+        hbg.classList.remove('open');
+        overlay.classList.add('visible');
+      }
+      sessionStorage.setItem('sidebarOpen', open);
+    }
+
+    apply();
+
+    btn.addEventListener('click', function() {
+      open = !open;
+      apply();
+    });
+
+    overlay.addEventListener('click', function() {
+      open = false;
+      apply();
+    });
+  }
+
+  // Retry until DOM elements exist (Streamlit renders async)
+  let attempts = 0;
+  const interval = setInterval(function() {
+    attempts++;
+    const sidebar = document.querySelector('[data-testid="stSidebar"]');
+    const btn = document.getElementById('sidebarToggleBtn');
+    if (sidebar && btn) { initToggle(); clearInterval(interval); }
+    if (attempts > 40) clearInterval(interval);
+  }, 100);
+})();
+</script>
 """
 
 
@@ -1275,47 +1324,14 @@ def _forgot_password_panel():
 # ══════════════════════════════════════════════════════════════════════════════
 
 def login_page():
+    # Hide sidebar on login
+    st.markdown(
+        "<style>section[data-testid='stSidebar']{display:none!important}</style>",
+        unsafe_allow_html=True,
+    )
     st.markdown(NEON_CSS, unsafe_allow_html=True)
-    # Hide sidebar + force full-width centered layout for login
-    st.markdown("""
-    <style>
-      section[data-testid="stSidebar"] { display:none !important; }
-
-      /* Full-width login: remove Streamlit's default block max-width */
-      [data-testid="block-container"] {
-        max-width: 100% !important;
-        padding: 0 !important;
-      }
-
-      /* Centering wrapper for the auth card */
-      .auth-outer {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-        background: transparent;
-      }
-
-      /* Auth card itself — fixed width, neon border */
-      .auth-inner {
-        width: 100%;
-        max-width: 480px;
-        background: #0c1420;
-        border: 1px solid rgba(0,212,255,0.22);
-        border-radius: 16px;
-        padding: 2.4rem 2rem 2rem;
-        box-shadow: 0 0 60px rgba(0,212,255,0.07), 0 0 0 1px rgba(0,212,255,0.05);
-      }
-    </style>
-    <div class="auth-outer">
-      <div class="auth-inner" id="authCard"></div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Streamlit widgets must live in columns — use a narrow centered column
-    gap, card, gap2 = st.columns([1, 1.6, 1])
-    with card:
+    _, col, _ = st.columns([1, 1.4, 1])
+    with col:
         st.markdown("<div class='auth-logo'>⬡</div>", unsafe_allow_html=True)
         st.markdown("<div class='auth-title'>GROQ·AI</div>", unsafe_allow_html=True)
         st.markdown(
@@ -1334,20 +1350,6 @@ def login_page():
 
 def chat_app():
     st.markdown(NEON_CSS, unsafe_allow_html=True)
-    # Centered, max-width constrained main content area
-    st.markdown("""
-    <style>
-      /* Chat app: centered content with comfortable reading width */
-      [data-testid="block-container"] {
-        max-width: 1050px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        padding-top: 1.5rem !important;
-      }
-    </style>
-    """, unsafe_allow_html=True)
     username = st.session_state.username
 
     sessions = load_sessions(username)
@@ -1479,94 +1481,18 @@ def chat_app():
 
     # ── MAIN AREA ─────────────────────────────────────────────────────────────
 
-    # Floating sidebar toggle button — injected via components.html so JS executes
-    components.html("""
-    <style>
-      * { margin:0; padding:0; box-sizing:border-box; }
-      body { background:transparent; overflow:hidden; }
-      #toggleBtn {
-        position: fixed;
-        top: 14px; left: 14px;
-        z-index: 99999;
-        width: 40px; height: 40px;
-        background: #0c1420;
-        border: 1px solid rgba(0,212,255,0.5);
-        border-radius: 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 8px rgba(0,212,255,0.5), 0 0 20px rgba(0,212,255,0.25);
-        transition: background 0.2s, box-shadow 0.2s;
-      }
-      #toggleBtn:hover {
-        background: rgba(0,212,255,0.12);
-        box-shadow: 0 0 12px rgba(0,212,255,0.7), 0 0 30px rgba(0,212,255,0.4);
-      }
-      .hbg { display:flex; flex-direction:column; gap:5px; width:18px; pointer-events:none; }
-      .hbg span {
-        display:block; height:2px;
-        background:#00d4ff;
-        border-radius:2px;
-        box-shadow:0 0 6px #00d4ff;
-        transition: transform 0.3s, opacity 0.3s;
-      }
-    </style>
-
-    <button id="toggleBtn" title="Toggle Sidebar">
-      <div class="hbg" id="hbg">
-        <span id="l1"></span>
-        <span id="l2"></span>
-        <span id="l3"></span>
-      </div>
-    </button>
-
-    <script>
-    (function() {
-      var doc   = window.parent.document;
-      var open  = window.parent.sessionStorage.getItem('sidebarOpen') !== 'false';
-      var btn   = document.getElementById('toggleBtn');
-      var l1    = document.getElementById('l1');
-      var l2    = document.getElementById('l2');
-      var l3    = document.getElementById('l3');
-
-      function applyState() {
-        var sidebar = doc.querySelector('[data-testid="stSidebar"]');
-        if (!sidebar) return;
-
-        if (open) {
-          sidebar.style.transform  = 'translateX(0)';
-          sidebar.style.transition = 'transform 0.35s cubic-bezier(0.4,0,0.2,1)';
-          // Hamburger icon
-          l1.style.transform = 'none'; l1.style.opacity = '1';
-          l2.style.transform = 'none'; l2.style.opacity = '1';
-          l3.style.transform = 'none'; l3.style.opacity = '1';
-        } else {
-          sidebar.style.transform  = 'translateX(-110%)';
-          sidebar.style.transition = 'transform 0.35s cubic-bezier(0.4,0,0.2,1)';
-          // X icon
-          l1.style.transform = 'translateY(7px) rotate(45deg)';
-          l2.style.opacity   = '0';
-          l3.style.transform = 'translateY(-7px) rotate(-45deg)';
-        }
-        window.parent.sessionStorage.setItem('sidebarOpen', open ? 'true' : 'false');
-      }
-
-      function waitAndApply() {
-        var sidebar = doc.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) { applyState(); }
-        else { setTimeout(waitAndApply, 80); }
-      }
-
-      waitAndApply();
-
-      btn.addEventListener('click', function() {
-        open = !open;
-        applyState();
-      });
-    })();
-    </script>
-    """, height=0, scrolling=False)
+    # Floating sidebar toggle button + dark overlay
+    st.markdown(
+        """
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar">
+          <div class="hbg open" id="hbgIcon">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Page header — offset to clear the toggle button
     st.markdown(
