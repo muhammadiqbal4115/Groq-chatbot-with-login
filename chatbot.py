@@ -125,12 +125,67 @@ html, body, [data-testid="stAppViewContainer"] {
   background: var(--neon-dim); border-radius: 4px;
 }
 
-/* ── Sidebar collapse button ── */
-[data-testid="stSidebarCollapseButton"] button {
-  color: var(--neon) !important;
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border) !important;
+/* ── Hide native Streamlit sidebar toggle ── */
+[data-testid="stSidebarCollapseButton"] {
+  display: none !important;
 }
+
+/* ── Sidebar HIDDEN state ── */
+[data-testid="stSidebar"].sidebar-collapsed {
+  transform: translateX(-110%) !important;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+  pointer-events: none !important;
+}
+
+[data-testid="stSidebar"]:not(.sidebar-collapsed) {
+  transform: translateX(0) !important;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── Main content shift when sidebar open ── */
+[data-testid="stMain"].main-shifted {
+  margin-left: 0 !important;
+  transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── Sidebar toggle button (floating) ── */
+.sidebar-toggle-btn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 1100 !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-bright) !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: var(--neon-glow) !important;
+  transition: background 0.2s, box-shadow 0.2s !important;
+  font-size: 1.1rem !important;
+  color: var(--neon) !important;
+  text-shadow: 0 0 8px var(--neon) !important;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--bg-hover) !important;
+  box-shadow: var(--neon-glow-lg) !important;
+}
+
+/* ── Animated hamburger lines ── */
+.hbg { display:flex; flex-direction:column; gap:4px; width:18px; }
+.hbg span {
+  display:block; height:2px; background:var(--neon);
+  border-radius:2px;
+  box-shadow: 0 0 6px var(--neon);
+  transition: all 0.3s;
+}
+.hbg.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hbg.open span:nth-child(2) { opacity:0; transform: scaleX(0); }
+.hbg.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 /* ── Typography ── */
 h1, h2, h3, h4 {
@@ -613,7 +668,69 @@ button[data-testid="baseButton-primary"]:hover {
 
 /* ── Sidebar auth hide ── */
 section[data-testid="stSidebar"].auth-hidden { display:none !important; }
+
+/* ── Overlay (mobile) ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 998;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.visible { display: block; }
 </style>
+
+<script>
+(function() {
+  // Sidebar toggle logic — runs after DOM ready
+  function initToggle() {
+    const sidebar = document.querySelector('[data-testid="stSidebar"]');
+    const btn     = document.getElementById('sidebarToggleBtn');
+    const hbg     = document.getElementById('hbgIcon');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar || !btn) return;
+
+    // Read stored state
+    let open = sessionStorage.getItem('sidebarOpen') !== 'false';
+
+    function apply() {
+      if (open) {
+        sidebar.classList.remove('sidebar-collapsed');
+        hbg.classList.add('open');
+        overlay.classList.remove('visible');
+      } else {
+        sidebar.classList.add('sidebar-collapsed');
+        hbg.classList.remove('open');
+        overlay.classList.add('visible');
+      }
+      sessionStorage.setItem('sidebarOpen', open);
+    }
+
+    apply();
+
+    btn.addEventListener('click', function() {
+      open = !open;
+      apply();
+    });
+
+    overlay.addEventListener('click', function() {
+      open = false;
+      apply();
+    });
+  }
+
+  // Retry until DOM elements exist (Streamlit renders async)
+  let attempts = 0;
+  const interval = setInterval(function() {
+    attempts++;
+    const sidebar = document.querySelector('[data-testid="stSidebar"]');
+    const btn = document.getElementById('sidebarToggleBtn');
+    if (sidebar && btn) { initToggle(); clearInterval(interval); }
+    if (attempts > 40) clearInterval(interval);
+  }, 100);
+})();
+</script>
 """
 
 
@@ -1363,10 +1480,26 @@ def chat_app():
             st.rerun()
 
     # ── MAIN AREA ─────────────────────────────────────────────────────────────
-    # Page header
+
+    # Floating sidebar toggle button + dark overlay
     st.markdown(
+        """
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar">
+          <div class="hbg open" id="hbgIcon">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Page header — offset to clear the toggle button
+    st.markdown(
+        "<div style='margin-left:54px'>"
         "<div class='page-title'>⬡ GROQ·AI CHATBOT</div>"
-        "<div class='page-subtitle'>STREAMLIT · LANGCHAIN · GROQ · GOOGLE SHEETS</div>",
+        "<div class='page-subtitle'>STREAMLIT · LANGCHAIN · GROQ · GOOGLE SHEETS</div>"
+        "</div>",
         unsafe_allow_html=True,
     )
     st.markdown("")
