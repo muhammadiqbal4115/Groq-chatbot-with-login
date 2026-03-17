@@ -46,7 +46,12 @@ NEON_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap');
 
-#tabs-bui47-tabpanel-0 {
+# #tabs-bui47-tabpanel-0 {
+#     width: 50%;
+#     margin: 0 auto;
+# }
+
+div[data-testid="stVerticalBlock"] {
     width: 50%;
     margin: 0 auto;
 }
