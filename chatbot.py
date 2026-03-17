@@ -589,7 +589,7 @@ section.main { background: var(--bg-deep) !important; }
 
 _AUTH_CSS = """
 <style>
-  section[data-testid="stSidebar"] { display:none !important; }
+  /* sidebar visible on all pages */
 
   .auth-logo {
     text-align:center;
