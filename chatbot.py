@@ -1275,14 +1275,47 @@ def _forgot_password_panel():
 # ══════════════════════════════════════════════════════════════════════════════
 
 def login_page():
-    # Hide sidebar on login
-    st.markdown(
-        "<style>section[data-testid='stSidebar']{display:none!important}</style>",
-        unsafe_allow_html=True,
-    )
     st.markdown(NEON_CSS, unsafe_allow_html=True)
-    _, col, _ = st.columns([1, 1.4, 1])
-    with col:
+    # Hide sidebar + force full-width centered layout for login
+    st.markdown("""
+    <style>
+      section[data-testid="stSidebar"] { display:none !important; }
+
+      /* Full-width login: remove Streamlit's default block max-width */
+      [data-testid="block-container"] {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+
+      /* Centering wrapper for the auth card */
+      .auth-outer {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: transparent;
+      }
+
+      /* Auth card itself — fixed width, neon border */
+      .auth-inner {
+        width: 100%;
+        max-width: 480px;
+        background: #0c1420;
+        border: 1px solid rgba(0,212,255,0.22);
+        border-radius: 16px;
+        padding: 2.4rem 2rem 2rem;
+        box-shadow: 0 0 60px rgba(0,212,255,0.07), 0 0 0 1px rgba(0,212,255,0.05);
+      }
+    </style>
+    <div class="auth-outer">
+      <div class="auth-inner" id="authCard"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Streamlit widgets must live in columns — use a narrow centered column
+    gap, card, gap2 = st.columns([1, 1.6, 1])
+    with card:
         st.markdown("<div class='auth-logo'>⬡</div>", unsafe_allow_html=True)
         st.markdown("<div class='auth-title'>GROQ·AI</div>", unsafe_allow_html=True)
         st.markdown(
@@ -1301,6 +1334,20 @@ def login_page():
 
 def chat_app():
     st.markdown(NEON_CSS, unsafe_allow_html=True)
+    # Centered, max-width constrained main content area
+    st.markdown("""
+    <style>
+      /* Chat app: centered content with comfortable reading width */
+      [data-testid="block-container"] {
+        max-width: 1050px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        padding-top: 1.5rem !important;
+      }
+    </style>
+    """, unsafe_allow_html=True)
     username = st.session_state.username
 
     sessions = load_sessions(username)
