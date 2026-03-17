@@ -63,66 +63,89 @@ header,
 /* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
 [data-testid="StyledFullScreenButton"] { display: none !important; }
 
-/* ─── SIDEBAR COLLAPSE ARROW — let Streamlit position it, just style it ─── */
+/* ─── SIDEBAR COLLAPSE ARROW — fixed to left edge, never over main content ─ */
 [data-testid="collapsedControl"] {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 9 !important;
-  background: #03111d !important;
-  border: 1px solid #00d4ff66 !important;
-  border-left: none !important;
+  display:       flex !important;
+  visibility:    visible !important;
+  opacity:       1 !important;
+  position:      fixed !important;
+  left:          0 !important;
+  top:           50vh !important;
+  transform:     translateY(-50%) !important;
+  z-index:       500 !important;
+  width:         auto !important;
+  background:    #03111d !important;
+  border:        1px solid #00d4ff66 !important;
+  border-left:   none !important;
   border-radius: 0 8px 8px 0 !important;
-  box-shadow: 3px 0 16px #00d4ff44 !important;
-  padding: 10px 6px !important;
-  cursor: pointer !important;
-  /* NO position:fixed — let Streamlit handle placement */
+  box-shadow:    3px 0 16px #00d4ff44 !important;
+  padding:       10px 6px !important;
+  cursor:        pointer !important;
+  transition:    box-shadow .25s, background .25s !important;
+  pointer-events: auto !important;
 }
 [data-testid="collapsedControl"]:hover {
   background: #041e30 !important;
   box-shadow: 3px 0 28px #00d4ff77 !important;
 }
 [data-testid="collapsedControl"] svg {
-  fill:   #00d4ff !important;
-  color:  #00d4ff !important;
-  filter: drop-shadow(0 0 5px #00d4ffaa) !important;
-  width:  18px !important;
-  height: 18px !important;
+  display:     block !important;
+  fill:        #00d4ff !important;
+  color:       #00d4ff !important;
+  filter:      drop-shadow(0 0 5px #00d4ffaa) !important;
+  width:       18px !important;
+  height:      18px !important;
+  flex-shrink: 0 !important;
 }
 [data-testid="collapsedControl"] button {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background:  transparent !important;
+  border:      none !important;
+  box-shadow:  none !important;
+  padding:     0 !important;
+  line-height: 0 !important;
 }
 
-/* ─── EXPANDER — arrow chevron must stay visible ─────────────────────────── */
+/* ─── EXPANDER — sits in normal flow, chevron always visible ─────────────── */
+[data-testid="stExpander"] {
+  border:        1px solid #00d4ff33 !important;
+  border-radius: 8px !important;
+  background:    #041825 !important;
+  position:      relative !important;
+  z-index:       2 !important;
+  overflow:      visible !important;
+  margin-top:    10px !important;
+}
+/* Expander summary row */
+[data-testid="stExpander"] details > summary,
+[data-testid="stExpander"] summary {
+  display:        flex !important;
+  align-items:    center !important;
+  gap:            8px !important;
+  padding:        10px 14px !important;
+  cursor:         pointer !important;
+  color:          #00d4ff !important;
+  font-size:      .92rem !important;
+  letter-spacing: .04em !important;
+  list-style:     none !important;
+  user-select:    none !important;
+}
+[data-testid="stExpander"] details > summary::-webkit-details-marker,
+[data-testid="stExpander"] summary::-webkit-details-marker {
+  display: none !important;
+}
+[data-testid="stExpander"] summary:hover { color: #66eeff !important; }
+/* The chevron SVG */
 [data-testid="stExpander"] summary svg,
-[data-testid="stExpander"] summary [data-testid="stExpanderToggleIcon"],
-[data-testid="stExpander"] details > summary > span > svg,
-[data-testid="stExpander"] details summary svg {
-  display:    inline-block !important;
-  visibility: visible !important;
+[data-testid="stExpander"] details summary svg,
+[data-testid="stExpander"] [data-testid="stExpanderToggleIcon"] {
+  display:     inline-block !important;
+  visibility:  visible !important;
   fill:        #00d4ff !important;
   color:       #00d4ff !important;
   filter:      drop-shadow(0 0 4px #00d4ff88) !important;
-  width:  16px !important;
-  height: 16px !important;
+  width:       16px !important;
+  height:      16px !important;
   flex-shrink: 0 !important;
-}
-[data-testid="stExpander"] details > summary {
-  display:     flex !important;
-  align-items: center !important;
-  gap:         8px !important;
-  padding:     10px 14px !important;
-  cursor:      pointer !important;
-  color:       #00d4ff !important;
-  font-size:   .92rem !important;
-  letter-spacing: .04em;
-  list-style:  none !important;
-}
-[data-testid="stExpander"] details > summary::-webkit-details-marker {
-  display: none !important;
 }
 
 /* ─── CSS VARIABLES ─────────────────────────────────────────────────────── */
