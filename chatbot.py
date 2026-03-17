@@ -63,6 +63,18 @@ header,
 /* Fullscreen icon only inside the image/chart toolbar, NOT on buttons */
 [data-testid="StyledFullScreenButton"] { display: none !important; }
 
+/* ─── HIDE MATERIAL ICON TEXT FALLBACK ──────────────────────────────────── */
+[data-testid="stIconMaterial"],
+span[data-testid="stIconMaterial"],
+.exvv1vr0,
+span[translate="no"][data-testid="stIconMaterial"] {
+  display: none !important;
+  visibility: hidden !important;
+  font-size: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
 /* ─── SIDEBAR COLLAPSE ARROW — fixed to left edge, never over main content ─ */
 [data-testid="collapsedControl"] {
   display:       flex !important;
